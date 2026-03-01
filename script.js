@@ -5,6 +5,10 @@ let score = 0;
 let wrong = 0;
 let totalQuestions = 10;
 
+/* ============================= */
+/* POMOĆNE FUNKCIJE */
+/* ============================= */
+
 function normalize(text){
 return text.toLowerCase().trim().replace(/\s+/g,"");
 }
@@ -18,7 +22,7 @@ return text.replace(/\s/g,"")
 }
 
 function hearts(){
-for(let i=0;i<12;i++){
+for(let i=0;i<15;i++){
 let h=document.createElement("div");
 h.className="heart";
 h.innerHTML="❤";
@@ -27,6 +31,10 @@ document.body.appendChild(h);
 setTimeout(()=>h.remove(),3000);
 }
 }
+
+/* ============================= */
+/* START NIVOA */
+/* ============================= */
 
 function startLevel(level){
 
@@ -48,12 +56,18 @@ buildQuestions(level);
 showQuestion();
 }
 
+/* ============================= */
+/* BAZA PITANJA */
+/* ============================= */
+
 function buildQuestions(level){
 
 questions=[];
 
 if(level===1){
+
 totalQuestions=10;
+
 questions=[
 {q:"НАПИШИ ЦИФРАМА: ДЕВЕТНАЕСТ",a:"19"},
 {q:"НАПИШИ РЕЧИМА БРОЈ 16",a:"шеснаест"},
@@ -66,10 +80,13 @@ questions=[
 {q:"УПИШИ ЗНАК: 18 __ 20",a:"<"},
 {q:"УПИШИ ЗНАК: 17 __ 1Д7Ј",a:"="}
 ];
+
 }
 
 if(level===2){
+
 totalQuestions=10;
+
 questions=[
 {q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДО 20",a:"2,4,6,8,10,12,14,16,18,20",type:"subset"},
 {q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",a:"1,3,5,7,9,11,13,15,17,19",type:"subset"},
@@ -82,10 +99,13 @@ questions=[
 {q:"ДА ЛИ ЈЕ 18 ПАРАН? (ДА/НЕ)",a:"да"},
 {q:"ДА ЛИ ЈЕ 17 ПАРАН? (ДА/НЕ)",a:"не"}
 ];
+
 }
 
 if(level===3){
+
 totalQuestions=10;
+
 questions=[
 {q:"НАСТАВИ НИЗ: 2,4,6,__,__",a:"8,10"},
 {q:"НАСТАВИ НИЗ: 11,13,15,__,__",a:"17,19"},
@@ -98,10 +118,13 @@ questions=[
 {q:"НАСТАВИ НИЗ: 20,18,16,__,__",a:"14,12"},
 {q:"НАСТАВИ НИЗ: 5,10,15,__,__",a:"20,25"}
 ];
+
 }
 
 if(level===4){
+
 totalQuestions=10;
+
 questions=[
 {q:"АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. НАПИШИ ПОСТУПАК.",a:12,type:"oduz"},
 {q:"МИЛИЦА ЈЕ ИМАЛА 15 БОМБОНА. ДАЛА ЈЕ 7. НАПИШИ ПОСТУПАК.",a:8,type:"oduz"},
@@ -114,27 +137,40 @@ questions=[
 {q:"ИЗРАЧУНАЈ 19 - 5",a:"14"},
 {q:"ИЗРАЧУНАЈ 17 - 6",a:"11"}
 ];
+
 }
 
 if(level===5){
+
 totalQuestions=30;
+
 questions = [].concat(
-buildLevelQuestions(1),
-buildLevelQuestions(2),
-buildLevelQuestions(3),
-buildLevelQuestions(4)
-);
-questions = questions.slice(0,30);
-}
+buildCopy(1),
+buildCopy(2),
+buildCopy(3),
+buildCopy(4)
+).slice(0,30);
 
 }
 
-function buildLevelQuestions(level){
-let temp=[];
+}
+
+/* Kopija bez menjanja globalnog niza */
+function buildCopy(level){
+let tempIndex=index;
+let tempScore=score;
+let tempWrong=wrong;
 buildQuestions(level);
-temp=[...questions];
-return temp;
+let copy=[...questions];
+index=tempIndex;
+score=tempScore;
+wrong=tempWrong;
+return copy;
 }
+
+/* ============================= */
+/* PRIKAZ PITANJA */
+/* ============================= */
 
 function showQuestion(){
 document.getElementById("question").innerText=
@@ -142,6 +178,10 @@ document.getElementById("question").innerText=
 document.getElementById("answer").value="";
 document.getElementById("feedback").innerText="";
 }
+
+/* ============================= */
+/* PROVERA */
+/* ============================= */
 
 function smartCheck(user,q){
 
@@ -201,6 +241,10 @@ finishLevel();
 }
 }
 
+/* ============================= */
+/* ZAVRŠETAK NIVOA */
+/* ============================= */
+
 function finishLevel(){
 
 let percent=Math.round((score/totalQuestions)*100);
@@ -217,16 +261,53 @@ document.getElementById("result").innerHTML=
 "ПРОЦЕНАТ: "+percent+"%<br>"+
 "ОЦЕНА: "+grade;
 
-if(score>=8 && totalQuestions===10){
+if(totalQuestions===10 && score>=8){
 unlockNextLevel();
+}
+
+setTimeout(()=>{
+document.getElementById("gameArea").classList.add("hidden");
+document.getElementById("map").classList.remove("hidden");
+},3000);
+
+}
+
+/* ============================= */
+/* OTKLJUČAVANJE */
+/* ============================= */
+
+function unlockNextLevel(){
+
+let unlocked = JSON.parse(localStorage.getItem("unlockedLevels")) || [1];
+
+let next = currentLevel + 1;
+
+if(!unlocked.includes(next) && next<=5){
+unlocked.push(next);
+localStorage.setItem("unlockedLevels",JSON.stringify(unlocked));
+}
+
+applyUnlockedLevels();
+}
+
+function applyUnlockedLevels(){
+
+let unlocked = JSON.parse(localStorage.getItem("unlockedLevels")) || [1];
+
+for(let i=1;i<=5;i++){
+let el=document.getElementById("level"+i);
+if(el && unlocked.includes(i)){
+el.classList.remove("locked");
+el.onclick=function(){startLevel(i);}
 }
 }
 
-function unlockNextLevel(){
-let next=currentLevel+1;
-let el=document.getElementById("level"+next);
-if(el){
-el.classList.remove("locked");
-el.onclick=function(){startLevel(next);}
 }
-}
+
+/* ============================= */
+/* LOAD */
+/* ============================= */
+
+window.onload=function(){
+applyUnlockedLevels();
+};
