@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Магична Башта Бројева</title>
+<title>👑 Магична Школа Бројева</title>
 
 <style>
+
 body{
 margin:0;
-font-family:Arial, sans-serif;
-background:#ff4d6d;
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(135deg,#ff4d6d,#ff1e56);
 display:flex;
 justify-content:center;
 padding:20px;
@@ -17,39 +18,88 @@ padding:20px;
 
 .app{
 background:white;
-max-width:800px;
+max-width:850px;
 width:100%;
-border-radius:20px;
-padding:25px;
+border-radius:25px;
+padding:30px;
+text-align:center;
+box-shadow:0 15px 40px rgba(0,0,0,0.3);
+font-weight:bold;
+color:#b00020;
+}
+
+h1{
+font-size:28px;
+color:#d00000;
+}
+
+input{
+padding:12px;
+font-size:20px;
+border-radius:15px;
+border:3px solid #ff4d6d;
+width:280px;
 text-align:center;
 font-weight:bold;
 }
 
-h1{font-size:26px;}
-
-input{
-padding:10px;
-font-size:18px;
-width:80%;
-margin-top:10px;
-}
-
 button{
-padding:10px 20px;
+background:#d00000;
+color:white;
+border:none;
+padding:14px 22px;
+border-radius:15px;
 font-size:18px;
-margin-top:10px;
 cursor:pointer;
+margin-top:12px;
+font-weight:bold;
 }
 
 .question{
-margin:20px 0;
-font-size:20px;
+font-size:22px;
+margin:25px 0;
+min-height:60px;
+}
+
+.feedback{
+font-size:22px;
+margin-top:10px;
+}
+
+.stats{
+margin-top:15px;
+background:#ffe5ec;
+padding:15px;
+border-radius:15px;
+font-size:18px;
 }
 
 .result{
-margin-top:20px;
-font-size:20px;
+margin-top:25px;
+font-size:22px;
 }
+
+.heart{
+position:fixed;
+top:-20px;
+color:#ff1e56;
+font-size:28px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh);
+opacity:0;
+}
+}
+
+@media (max-width:600px){
+.question{font-size:20px;}
+input{width:95%;}
+button{width:95%;}
+}
+
 </style>
 </head>
 
@@ -57,21 +107,31 @@ font-size:20px;
 
 <div class="app">
 
-<h1>МАГИЧНА БАШТА БРОЈЕВА</h1>
+<h1>👑 МАГИЧНА ШКОЛА БРОЈЕВА 🌹</h1>
 
-<input id="studentName" placeholder="УНЕСИ ИМЕ">
+<input id="studentName" placeholder="УНЕСИ СВОЈЕ ИМЕ">
 <br>
-<button onclick="startTest()">ПОЧНИ</button>
+<button onclick="startGame()">ПОЧНИ ТЕСТ (30 ПИТАЊА)</button>
 
-<div id="game" style="display:none;">
+<div id="gameArea" style="display:none;">
+
 <div class="question" id="question"></div>
+
 <input id="answer">
 <br>
-<button onclick="check()">ПРОВЕРИ</button>
-<div id="feedback"></div>
-<div class="result" id="result"></div>
+<button onclick="nextQuestion()">ПРОВЕРИ</button>
+
+<div id="feedback" class="feedback"></div>
+
+<div class="stats">
+ТАЧНО: <span id="correctCount">0</span> |
+ПОГРЕШНО: <span id="wrongCount">0</span> |
+ПРОЦЕНАТ: <span id="percent">0</span>%
 </div>
 
+<div class="result" id="result"></div>
+
+</div>
 </div>
 
 <script>
@@ -79,6 +139,7 @@ font-size:20px;
 let questions=[];
 let index=0;
 let score=0;
+let wrong=0;
 
 // ===== LATINICA → ĆIRILICA =====
 function normalize(text){
@@ -103,7 +164,6 @@ return result.replace(/\s+/g,"");
 
 // ===== GENERATOR 30 PITANJA =====
 function generate(){
-
 questions=[];
 
 for(let i=0;i<10;i++){
@@ -131,18 +191,17 @@ a:(n%2==0)?"да":"не"
 });
 }
 
-// izmešaj
 questions.sort(()=>Math.random()-0.5);
 }
 
-function startTest(){
+function startGame(){
 let name=document.getElementById("studentName").value;
 if(!name){
 alert("УНЕСИ ИМЕ");
 return;
 }
 generate();
-document.getElementById("game").style.display="block";
+document.getElementById("gameArea").style.display="block";
 show();
 }
 
@@ -153,7 +212,7 @@ document.getElementById("answer").value="";
 document.getElementById("feedback").innerText="";
 }
 
-function check(){
+function nextQuestion(){
 
 let user=document.getElementById("answer").value;
 if(user.trim()==""){
@@ -162,7 +221,6 @@ return;
 }
 
 let correct=questions[index].a;
-
 let ok=false;
 
 // broj
@@ -175,18 +233,40 @@ ok = normalize(user) === normalize(correct);
 
 if(ok){
 score++;
-document.getElementById("feedback").innerText="ТАЧНО";
+document.getElementById("feedback").innerText="ТАЧНО 💖";
+heartsEffect();
 }else{
-document.getElementById("feedback").innerText="НЕТАЧНО";
+wrong++;
+document.getElementById("feedback").innerText="НЕТАЧНО ❌";
 }
+
+updateStats();
 
 index++;
 
 if(index<30){
-setTimeout(show,600);
+setTimeout(show,800);
 }else{
 finish();
 }
+}
+
+function heartsEffect(){
+for(let i=0;i<20;i++){
+let heart=document.createElement("div");
+heart.className="heart";
+heart.innerHTML="❤";
+heart.style.left=Math.random()*100+"vw";
+document.body.appendChild(heart);
+setTimeout(()=>heart.remove(),3000);
+}
+}
+
+function updateStats(){
+document.getElementById("correctCount").innerText=score;
+document.getElementById("wrongCount").innerText=wrong;
+let percent=Math.round((score/(score+wrong))*100);
+document.getElementById("percent").innerText=percent;
 }
 
 function finish(){
@@ -198,7 +278,11 @@ else if(percent>=75) grade=4;
 else if(percent>=60) grade=3;
 else if(percent>=40) grade=2;
 
+document.getElementById("question").innerText="ТЕСТ ЈЕ ЗАВРШЕН!";
+document.getElementById("answer").style.display="none";
+
 document.getElementById("result").innerHTML=
+"🌸 РЕЗУЛТАТ 🌸<br><br>"+
 "ТАЧНО: "+score+" ОД 30<br>"+
 "ПРОЦЕНАТ: "+percent+"%<br>"+
 "ОЦЕНА: "+grade;
