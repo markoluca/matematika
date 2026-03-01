@@ -32,40 +32,112 @@ setTimeout(()=>h.remove(),3000);
 }
 }
 
-/* ================= AUTO PROVERA ================= */
+/* ================= OTKLJUČAVANJE ================= */
 
-function triggerAutoCheck(){
+function unlockNext(){
+let unlocked=JSON.parse(localStorage.getItem("princess"))||[1];
+let next=currentLevel+1;
+if(next<=5 && !unlocked.includes(next)){
+unlocked.push(next);
+localStorage.setItem("princess",JSON.stringify(unlocked));
+}
+applyUnlock();
+}
+
+function applyUnlock(){
+let unlocked=JSON.parse(localStorage.getItem("princess"))||[1];
+for(let i=1;i<=5;i++){
+let el=document.getElementById("level"+i);
+if(unlocked.includes(i)){
+el.classList.remove("locked");
+el.onclick=function(){ startLevel(i); };
+}
+}
+}
+
+window.onload=applyUnlock;
+
+/* ================= START ================= */
+
+function startLevel(level){
+
+let name=document.getElementById("studentName").value;
+if(!name){ alert("УНЕСИ ИМЕ 👑"); return; }
+
+currentLevel=level;
+index=0;
+score=0;
+
+document.getElementById("map").classList.add("hidden");
+document.getElementById("gameArea").classList.remove("hidden");
+
+buildQuestions(level);
+showQuestion();
+}
+
+/* ================= PITANJA ================= */
+
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+function buildQuestions(level){
+
+let pool=[];
+
+if(level===1){
+totalQuestions=10;
+pool=[
+{q:"НАПИШИ ЦИФРАМА: СЕДАМНАЕСТ",a:"17"},
+{q:"НАПИШИ РЕЧИМА БРОЈ 18",a:"осамнаест"},
+{q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 14?",a:"4"},
+{q:"ПРЕТХОДНИК БРОЈА 13",a:"12"},
+{q:"УПИШИ ЗНАК: 16 __ 19",a:"<",type:"sign"},
+{q:"НАЈМАЊИ ПАРНИ БРОЈ ДО 10",a:"2"},
+{q:"БРОЈ ИЗМЕЂУ 12 И 14",a:"13"},
+{q:"КОЛИКО ДЕСЕТИЦА ИМА БРОЈ 20?",a:"2"},
+{q:"НАПИШИ ЦИФРАМА: ПЕТНАЕСТ",a:"15"},
+{q:"УПИШИ ЗНАК: 15 __ 15",a:"=",type:"sign"}
+];
+}
+
+if(level===2){
+totalQuestions=10;
+pool=[
+{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДО 20",a:"2,4,6,8,10,12,14,16,18,20",type:"subset"},
+{q:"ДА ЛИ ЈЕ 16 ПАРАН? (ДА/НЕ)",a:"да"},
+{q:"НЕПАРАН БРОЈ ИЗМЕЂУ 10 И 14",a:"11"},
+{q:"ПАРНИ ПРЕТХОДНИК БРОЈА 19",a:"18"},
+{q:"НЕПАРНИ СЛЕДБЕНИК БРОЈА 18",a:"19"},
+{q:"УПИШИ ЗНАК: 14 __ 18",a:"<",type:"sign"},
+{q:"ДА ЛИ ЈЕ 13 ПАРАН? (ДА/НЕ)",a:"не"},
+{q:"ПАРАН БРОЈ ИЗМЕЂУ 14 И 18",a:"16"},
+{q:"НАЈМАЊИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"11"},
+{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",a:"1,3,5,7,9,11,13,15,17,19",type:"subset"}
+];
+}
+
+questions=shuffle(pool);
+}
+
+/* ================= PRIKAZ ================= */
+
+function showQuestion(){
 
 let q=questions[index];
-let user=document.getElementById("answer").value;
 
-if(autoTimer) clearTimeout(autoTimer);
+document.getElementById("question").innerText=
+"ПИТАЊЕ "+(index+1)+" ОД "+totalQuestions+": "+q.q;
+
+document.getElementById("answer").value="";
 
 if(q.type==="sign"){
-checkAnswer();
-return;
+showSignKeyboard();
 }
-
-if(q.type==="oduz"){
-if(user.includes("=")){
-checkAnswer();
+else if(q.type==="subset" || !isNaN(q.a)){
+showNumericKeyboard();
 }
-return;
+else{
+showCyrillicKeyboard();
 }
-
-if(q.type==="subset"){
-if(user.includes(",")){
-autoTimer=setTimeout(checkAnswer,800);
-}
-return;
-}
-
-if(!isNaN(q.a)){
-autoTimer=setTimeout(checkAnswer,600);
-return;
-}
-
-autoTimer=setTimeout(checkAnswer,900);
 }
 
 /* ================= TASTATURE ================= */
@@ -118,7 +190,27 @@ input.value+=c;
 triggerAutoCheck();
 }
 
+/* ================= AUTO PROVERA ================= */
+
+function triggerAutoCheck(){
+if(autoTimer) clearTimeout(autoTimer);
+autoTimer=setTimeout(checkAnswer,600);
+}
+
 /* ================= PROVERA ================= */
+
+function smartCheck(user,q){
+
+if(q.type==="subset"){
+return JSON.stringify(normalizeList(user))===JSON.stringify(normalizeList(q.a));
+}
+
+if(!isNaN(q.a)){
+return Number(user)===Number(q.a);
+}
+
+return normalize(user)===normalize(q.a);
+}
 
 function checkAnswer(){
 
@@ -143,4 +235,16 @@ setTimeout(showQuestion,700);
 }else{
 finishLevel();
 }
+}
+
+function finishLevel(){
+
+if(score>=8){
+unlockNext();
+}
+
+setTimeout(()=>{
+document.getElementById("gameArea").classList.add("hidden");
+document.getElementById("map").classList.remove("hidden");
+},2000);
 }
