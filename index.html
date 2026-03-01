@@ -1,7 +1,4 @@
 <!DOCTYPE html>
-<script>
-alert("РАДИ 👑");
-</script>
 <html lang="sr">
 <head>
 <meta charset="UTF-8">
@@ -22,7 +19,7 @@ padding:20px;
 .app{
 background:white;
 width:100%;
-max-width:950px;
+max-width:900px;
 border-radius:25px;
 padding:25px;
 box-shadow:0 15px 40px rgba(0,0,0,0.3);
@@ -107,6 +104,32 @@ transform:scale(0.9);
 background:#a00000;
 }
 
+#timerBarContainer{
+width:100%;
+height:10px;
+background:#ffe5ec;
+border-radius:10px;
+margin:10px 0;
+overflow:hidden;
+}
+
+#timerBar{
+height:100%;
+width:100%;
+background:#d00000;
+transition:width 1s linear;
+}
+
+#finishNowBtn{
+margin-top:8px;
+background:#ff4d6d;
+color:white;
+border:none;
+padding:8px 15px;
+border-radius:12px;
+cursor:pointer;
+}
+
 .stats{
 margin-top:15px;
 background:#ffe5ec;
@@ -143,9 +166,6 @@ opacity:0;
 <div id="map" class="level-map">
 <div class="level" id="level1">🌸 НИВО 1</div>
 <div class="level locked" id="level2">💖 НИВО 2</div>
-<div class="level locked" id="level3">🎀 НИВО 3</div>
-<div class="level locked" id="level4">👑 НИВО 4</div>
-<div class="level locked" id="level5">🏆 НИВО 5</div>
 </div>
 
 <div id="gameArea" class="hidden">
@@ -154,14 +174,18 @@ opacity:0;
 
 <input id="answer" readonly>
 
+<div id="timerBarContainer">
+<div id="timerBar"></div>
+</div>
+
+<button id="finishNowBtn" onclick="checkAnswer()">ЗАВРШИ</button>
+
 <div id="keyboardContainer"></div>
 
 <div class="stats">
 ТАЧНО: <span id="correct">0</span> |
 ПРОЦЕНАТ: <span id="percent">0</span>%
 </div>
-
-<div id="result"></div>
 
 </div>
 
@@ -170,4 +194,3 @@ opacity:0;
 <script src="script.js"></script>
 </body>
 </html>
-
