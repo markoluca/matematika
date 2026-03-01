@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌹 Магична Башта Бројева</title>
+<title>🌹 Магична Башта Бројева PRO</title>
 
 <style>
 body{
@@ -19,7 +19,7 @@ overflow-x:hidden;
 .app{
 background:white;
 color:#b00020;
-max-width:950px;
+max-width:1000px;
 width:100%;
 border-radius:25px;
 box-shadow:0 15px 40px rgba(0,0,0,0.25);
@@ -60,7 +60,6 @@ margin-top:15px;
 background:#ffe5ec;
 padding:12px;
 border-radius:15px;
-font-size:16px;
 }
 
 .progress{
@@ -104,7 +103,7 @@ opacity:0;
 
 <div class="app">
 
-<h1>👑 Магични бројеви за играње 🌹</h1>
+<h1>👑 Магична Башта Бројева 🌹</h1>
 
 <input id="studentName" placeholder="Унеси своје име">
 <br>
@@ -140,13 +139,11 @@ let questions=[];
 let current=0;
 let score=0;
 let wrong=0;
-let student="";
 
-// ================= LATINICA → ĆIRILICA =================
+// ===== NORMALIZACIJA =====
 function normalize(text){
-text = text.toLowerCase().trim();
-
-const map = {
+text=text.toLowerCase().trim();
+const map={
 "a":"а","b":"б","c":"ц","č":"ч","ć":"ћ",
 "d":"д","đ":"ђ","e":"е","f":"ф",
 "g":"г","h":"х","i":"и","j":"ј",
@@ -155,19 +152,13 @@ const map = {
 "š":"ш","t":"т","u":"у","v":"в",
 "z":"з","ž":"ж"
 };
-
 let result="";
-for(let char of text){
-result += map[char] || char;
-}
-
+for(let char of text){ result+=map[char]||char; }
 return result.replace(/\s+/g,"");
 }
 
-// ================= PARSIRANJE NIZA =================
 function parseNumbers(text){
-return text
-.replace(/\s/g,"")
+return text.replace(/\s/g,"")
 .split(",")
 .map(n=>n.trim())
 .filter(n=>n!=="")
@@ -175,68 +166,106 @@ return text
 .join(",");
 }
 
-// ================= START =================
+// ===== PAMETNA PROVERA =====
+function smartCheck(user, correct){
+
+// niz
+if(correct.includes(",")){
+return parseNumbers(user)==parseNumbers(correct);
+}
+
+// broj
+if(!isNaN(correct)){
+return Number(user)==Number(correct);
+}
+
+// tekst
+return normalize(user)==normalize(correct);
+}
+
+// ===== GENERATOR =====
+function rand(min,max){
+return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function generateTest(){
+
+let pool=[];
+
+// 1. Cifre
+let words=[
+["једанаест",11],["дванаест",12],["тринаест",13],
+["четрнаест",14],["петнаест",15],
+["шеснаест",16],["седамнаест",17],
+["осамнаест",18],["деветнаест",19]
+];
+
+for(let i=0;i<5;i++){
+let w=words[rand(0,words.length-1)];
+pool.push({q:"Напиши цифрама број "+w[0],a:w[1].toString()});
+}
+
+// 2. Parni
+for(let i=0;i<5;i++){
+let n=rand(5,20);
+pool.push({
+q:"Да ли је број "+n+" паран? (да/не)",
+a:(n%2==0)?"да":"не"
+});
+}
+
+// 3. Jedinice / desetice
+for(let i=0;i<5;i++){
+let n=rand(11,20);
+pool.push({
+q:"Колико јединица има број "+n+"?",
+a:(n%10).toString()
+});
+pool.push({
+q:"Колико десетица има број "+n+"?",
+a:Math.floor(n/10).toString()
+});
+}
+
+// 4. Uporedi
+for(let i=0;i<5;i++){
+let a=rand(5,20);
+let b=rand(5,20);
+let znak=a>b?">":a<b?"<":"=";
+pool.push({q:"Упореди "+a+" __ "+b,a:znak});
+}
+
+// 5. Računanje
+for(let i=0;i<5;i++){
+let a=rand(5,15);
+let b=rand(1,10);
+pool.push({q:"Израчунај "+a+" + "+b,a:(a+b).toString()});
+}
+
+// nasumično 30
+pool.sort(()=>Math.random()-0.5);
+questions=pool.slice(0,30);
+}
+
+// ===== START =====
 function startGame(){
-student=document.getElementById("studentName").value;
-if(!student) return alert("Унеси име!");
-
-generateQuestions();
-shuffleQuestions();
-
+if(!document.getElementById("studentName").value){
+alert("Унеси име!");
+return;
+}
+generateTest();
 document.getElementById("gameArea").style.display="block";
 showQuestion();
-}
-
-// ================= 30 PITANJA =================
-function generateQuestions(){
-questions=[
-{q:"Напиши цифрама број деветнаест",a:"19"},
-{q:"Напиши цифрама број дванаест",a:"12"},
-{q:"Напиши цифрама број осам",a:"8"},
-{q:"Напиши цифрама број четрнаест",a:"14"},
-{q:"Који број има 1Д 0Ј?",a:"10"},
-{q:"Који број има 1Д 5Ј?",a:"15"},
-{q:"Који број има 0Д 5Ј?",a:"5"},
-{q:"Наброј непарне бројеве између 12 и 20",a:"13,15,17,19"},
-{q:"Наброј парне бројеве веће од 8 а мање од 18",a:"10,12,14,16"},
-{q:"Упореди 18 __ 20",a:"<"},
-{q:"Упореди 2Д __ 1Д 5Ј",a:">"},
-{q:"Парни број мањи од 14 а већи од 10",a:"12"},
-{q:"Непарни претходник броја 19",a:"17"},
-{q:"Израчунај 10Ј + 6Ј",a:"16"},
-{q:"Израчунај 15 - 5",a:"10"},
-{q:"Допуни: 5, 6, __ , 8",a:"7"},
-{q:"Наброј парне бројеве прве десетице",a:"2,4,6,8,10"},
-{q:"Наброј непарне бројеве друге десетице",a:"11,13,15,17,19"},
-{q:"Да ли је 14 паран? (да/не)",a:"да"},
-{q:"Да ли је 15 паран? (да/не)",a:"не"},
-{q:"Напиши речима број 16",a:"шеснаест"},
-{q:"Напиши речима број 12",a:"дванаест"},
-{q:"Поређај 5, 14, 3 од најмањег",a:"3,5,14"},
-{q:"Израчунај збир прва три непарна броја",a:"9"},
-{q:"Колико десетица има број 20?",a:"2"},
-{q:"Колико јединица има број 11?",a:"1"},
-{q:"Највећи непарни број друге десетице",a:"19"},
-{q:"Највећи парни једноцифрени број",a:"8"},
-{q:"Наброј све непарне бројеве до 10",a:"1,3,5,7,9"},
-{q:"Наброј све парне бројеве до 10",a:"2,4,6,8,10"}
-];
-}
-
-function shuffleQuestions(){
-questions.sort(()=>Math.random()-0.5);
 }
 
 function showQuestion(){
 document.getElementById("question").innerText=
 "Питање "+(current+1)+" од 30: "+questions[current].q;
-
 document.getElementById("answer").value="";
-document.getElementById("feedback").innerText="";
 updateProgress();
 }
 
-// ================= PROVERA =================
+// ===== PROVERA =====
 function nextQuestion(){
 
 let user=document.getElementById("answer").value;
@@ -246,19 +275,8 @@ return;
 }
 
 let correctAnswer=questions[current].a;
-let isCorrect=false;
 
-if(correctAnswer.includes(",")){
-if(parseNumbers(user)==parseNumbers(correctAnswer)){
-isCorrect=true;
-}
-}else{
-if(normalize(user)==normalize(correctAnswer)){
-isCorrect=true;
-}
-}
-
-if(isCorrect){
+if(smartCheck(user,correctAnswer)){
 score++;
 document.getElementById("feedback").innerText="Тачно ✅";
 heartsEffect();
@@ -268,17 +286,16 @@ document.getElementById("feedback").innerText="Нетаčno ❌";
 }
 
 updateStats();
-
 current++;
 
-if(current<questions.length){
-setTimeout(showQuestion,800);
+if(current<30){
+setTimeout(showQuestion,700);
 }else{
 finishTest();
 }
 }
 
-// ================= SRCA =================
+// ===== SRCA =====
 function heartsEffect(){
 for(let i=0;i<15;i++){
 let heart=document.createElement("div");
@@ -290,7 +307,7 @@ setTimeout(()=>heart.remove(),3000);
 }
 }
 
-// ================= STATISTIKA =================
+// ===== STATISTIKA =====
 function updateStats(){
 document.getElementById("correctCount").innerText=score;
 document.getElementById("wrongCount").innerText=wrong;
@@ -303,7 +320,7 @@ document.getElementById("progressBar").style.width=
 ((current/30)*100)+"%";
 }
 
-// ================= KRAJ =================
+// ===== KRAJ =====
 function finishTest(){
 let percent=Math.round((score/30)*100);
 let grade=1;
@@ -318,14 +335,13 @@ document.getElementById("answer").style.display="none";
 
 document.getElementById("result").innerHTML=
 `
-🌸 ${student} 🌸<br>
+🌸 Резултат 🌸<br>
 Тачно: ${score} од 30<br>
 Проценат: ${percent}%<br>
 Оцена: ${grade}
 `;
 }
-</script>
 
+</script>
 </body>
 </html>
-
