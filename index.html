@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Школска Верзија – Магична Башта Бројева</title>
+<title>ТЕСТ 8 – Бројеви прве и друге десетице</title>
 
 <style>
 body{
 margin:0;
-font-family:'Segoe UI',sans-serif;
-background:linear-gradient(135deg,#e6f0ff,#ffffff);
+font-family:Segoe UI, sans-serif;
+background:#f4f6f9;
 display:flex;
 justify-content:center;
 padding:20px;
@@ -17,79 +17,43 @@ padding:20px;
 
 .app{
 background:white;
-max-width:750px;
+max-width:900px;
 width:100%;
-border-radius:20px;
-box-shadow:0 15px 40px rgba(0,0,0,0.1);
+border-radius:15px;
+box-shadow:0 10px 30px rgba(0,0,0,0.1);
 padding:30px;
-text-align:center;
 }
 
-h1{color:#2c3e50;}
+h1{text-align:center;}
+
+.question{
+margin:15px 0;
+padding:10px;
+background:#f9f9f9;
+border-radius:8px;
+}
 
 input{
-padding:8px;
-font-size:18px;
-border-radius:8px;
-border:1px solid #ccc;
+padding:6px;
+font-size:16px;
+margin-top:5px;
 }
 
 button{
-padding:10px 16px;
-margin:6px;
+padding:10px 15px;
+margin-top:15px;
+background:#2c3e50;
+color:white;
 border:none;
-border-radius:8px;
-cursor:pointer;
-font-weight:bold;
-background:#3498db;
-color:white;
-}
-
-button:disabled{
-background:#bdc3c7;
-cursor:not-allowed;
-}
-
-.map{
-margin:20px 0;
-display:flex;
-justify-content:space-around;
-}
-
-.level{
-padding:10px;
-border-radius:10px;
-width:100px;
-}
-
-.unlocked{
-background:#2ecc71;
-color:white;
+border-radius:5px;
 cursor:pointer;
 }
 
-.locked{
-background:#bdc3c7;
-color:white;
-}
-
-.question{
-font-size:20px;
-margin:20px 0;
-min-height:50px;
-}
-
-.stats{
-background:#f8f9fa;
-padding:15px;
-border-radius:10px;
+.result{
 margin-top:20px;
-}
-
-.grade{
-font-size:22px;
-font-weight:bold;
-margin-top:10px;
+padding:15px;
+background:#eef2f7;
+border-radius:8px;
 }
 </style>
 </head>
@@ -98,166 +62,112 @@ margin-top:10px;
 
 <div class="app">
 
-<h1>📚 Школска Верзија</h1>
+<h1>📚 ТЕСТ 8</h1>
 
-<div>
-<input id="studentName" placeholder="Унеси име ученика">
-<button onclick="saveStudent()">Пријави се</button>
-</div>
+<input id="student" placeholder="Унеси име ученика">
+<button onclick="startTest()">Започни тест</button>
 
-<h3 id="welcome"></h3>
+<div id="testArea"></div>
 
-<div class="map">
-<div id="lvl1" class="level unlocked" onclick="startLevel(1)">Ниво 1</div>
-<div id="lvl2" class="level locked">Ниво 2</div>
-<div id="lvl3" class="level locked">Ниво 3</div>
-<div id="lvl4" class="level locked">Ниво 4</div>
-<div id="lvl5" class="level locked">Ниво 5</div>
-</div>
-
-<div class="question" id="question"></div>
-<input type="text" id="answer" oninput="checkAnswer()">
-
-<div class="stats">
-<p>Тачно: <span id="correct">0</span></p>
-<p>Нетачно: <span id="wrong">0</span></p>
-<p>Проценат: <span id="percent">0</span>%</p>
-<div class="grade" id="grade"></div>
-</div>
+<div id="result" class="result"></div>
 
 </div>
 
 <script>
-let student="";
-let currentLevel=1;
-let questionCount=0;
+let questions=[];
+let answers=[];
+let studentName="";
+
+function normalize(text){
+return text.toLowerCase()
+.replace(/č/g,"ч").replace(/ć/g,"ћ")
+.replace(/š/g,"ш").replace(/ž/g,"ж")
+.replace(/đ/g,"ђ")
+.trim();
+}
+
+function startTest(){
+studentName=document.getElementById("student").value;
+if(!studentName) return alert("Унеси име ученика");
+
+generateQuestions();
+renderTest();
+}
+
+function generateQuestions(){
+
+questions=[
+{q:"1. Напиши цифрама број: деветнаест",a:"19"},
+{q:"1. Напиши цифрама број: дванаест",a:"12"},
+{q:"1. Напиши цифрама број: осам",a:"8"},
+{q:"1. Напиши цифрама број: четрнаест",a:"14"},
+{q:"1. Напиши цифрама број: осамнаест",a:"18"},
+
+{q:"2. Који број има 1Д 0Ј?",a:"10"},
+{q:"2. Који број има 1Д 1Ј?",a:"11"},
+{q:"2. Који број има 1Д 5Ј?",a:"15"},
+{q:"2. Који број има 0Д 5Ј?",a:"5"},
+
+{q:"3. Наброј непарне бројеве између 12 и 20 (раздвој запетом)",a:"13,15,17,19"},
+{q:"4. Наброј парне бројеве веће од 8 а мање од 18",a:"10,12,14,16"},
+
+{q:"6. Упореди: 18 __ 20",a:"<"},
+{q:"6. Упореди: 1Д __ 9Ј",a:">"},
+{q:"6. Упореди: 17 __ 1Д 7Ј",a:"="},
+{q:"6. Упореди: 2Д __ 1Д 5Ј",a:">"},
+
+{q:"7а. Парни број мањи од 14 а већи од 10",a:"12"},
+{q:"7б. Непарни број већи од 13 а мањи од 17",a:"15"},
+{q:"7в. Непарни претходник броја 19",a:"17"},
+{q:"7г. Парни следбеник броја 19",a:"20"}
+];
+}
+
+function renderTest(){
+let area=document.getElementById("testArea");
+area.innerHTML="";
+
+questions.forEach((item,index)=>{
+area.innerHTML+=`
+<div class="question">
+<p>${item.q}</p>
+<input id="q${index}">
+</div>
+`;
+});
+
+area.innerHTML+=`<button onclick="finishTest()">Заврши тест</button>`;
+}
+
+function finishTest(){
 let correct=0;
-let wrong=0;
-let correctAnswer;
 
-function saveStudent(){
-student=document.getElementById("studentName").value;
-if(!student)return;
+questions.forEach((item,index)=>{
+let user=document.getElementById("q"+index).value;
+if(normalize(user)==normalize(item.a)) correct++;
+});
 
-let data=JSON.parse(localStorage.getItem(student)||"{}");
-correct=data.correct||0;
-wrong=data.wrong||0;
-currentLevel=data.level||1;
+let percent=Math.round((correct/questions.length)*100);
+let grade=1;
 
-document.getElementById("welcome").innerText="Добро дошла, "+student;
-updateMap();
-updateStats();
-}
+if(percent>=90) grade=5;
+else if(percent>=75) grade=4;
+else if(percent>=60) grade=3;
+else if(percent>=40) grade=2;
 
-function updateMap(){
-for(let i=1;i<=5;i++){
-let el=document.getElementById("lvl"+i);
-if(i<=currentLevel){
-el.className="level unlocked";
-el.onclick=()=>startLevel(i);
-}else{
-el.className="level locked";
-el.onclick=null;
-}
-}
-}
+document.getElementById("result").innerHTML=
+`
+<h3>Резултат ученика: ${studentName}</h3>
+<p>Тачно: ${correct} од ${questions.length}</p>
+<p>Проценат: ${percent}%</p>
+<p><strong>Оцена: ${grade}</strong></p>
+`;
 
-function startLevel(lvl){
-questionCount=0;
-correct=0;
-wrong=0;
-currentLevel=lvl;
-newTask();
-}
-
-function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
-
-function newTask(){
-questionCount++;
-let text="";
-if(currentLevel==1){
-let a=rand(1,10),b=rand(1,10);
-correctAnswer=a+b;
-text="Израчунај "+a+" + "+b;
-}
-if(currentLevel==2){
-let n=rand(1,20);
-correctAnswer=(n%2===0)?"да":"не";
-text="Да ли је "+n+" паран?";
-}
-if(currentLevel==3){
-let a=rand(5,20),b=rand(5,20);
-correctAnswer=a>b?">":a<b?"<":"=";
-text="Упореди "+a+" __ "+b;
-}
-if(currentLevel==4){
-let s=rand(5,15);
-correctAnswer=s+2;
-text="Допуни низ "+s+", "+(s+1)+", __ , "+(s+3);
-}
-if(currentLevel==5){
-let a=rand(10,20),b=rand(1,10);
-correctAnswer=a-b;
-text="Израчунај "+a+" - "+b;
-}
-
-document.getElementById("question").innerText=
-"Питање "+questionCount+": "+text;
-document.getElementById("answer").value="";
-}
-
-function checkAnswer(){
-let user=document.getElementById("answer").value.toLowerCase().trim();
-
-if(user==correctAnswer){
-correct++;
-}else{
-wrong++;
-}
-
-updateStats();
-saveProgress();
-
-if(questionCount<10){
-setTimeout(newTask,700);
-}else{
-finishLevel();
-}
-}
-
-function updateStats(){
-document.getElementById("correct").innerText=correct;
-document.getElementById("wrong").innerText=wrong;
-let total=correct+wrong;
-let percent=total>0?Math.round((correct/total)*100):0;
-document.getElementById("percent").innerText=percent;
-
-let grade="";
-if(percent>=90) grade="Оцена: 5";
-else if(percent>=75) grade="Оцена: 4";
-else if(percent>=60) grade="Оцена: 3";
-else if(percent>=40) grade="Оцена: 2";
-else grade="Оцена: 1";
-document.getElementById("grade").innerText=grade;
-}
-
-function finishLevel(){
-let percent=Math.round((correct/(correct+wrong))*100);
-
-if(percent>=70 && currentLevel<5){
-currentLevel++;
-alert("Ниво откључан!");
-}
-
-updateMap();
-saveProgress();
-}
-
-function saveProgress(){
-localStorage.setItem(student,JSON.stringify({
+localStorage.setItem(studentName,JSON.stringify({
 correct:correct,
-wrong:wrong,
-level:currentLevel
+total:questions.length,
+percent:percent,
+grade:grade
 }));
 }
 </script>
