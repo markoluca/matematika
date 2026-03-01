@@ -3,57 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ТЕСТ 8 – Бројеви прве и друге десетице</title>
+<title>🌹 Магична Башта Бројева</title>
 
 <style>
 body{
 margin:0;
-font-family:Segoe UI, sans-serif;
-background:#f4f6f9;
+font-family:'Comic Sans MS',cursive;
+background:linear-gradient(135deg,#ff4d6d,#ff758f);
 display:flex;
 justify-content:center;
 padding:20px;
+color:#fff;
 }
 
 .app{
 background:white;
-max-width:900px;
+color:#b00020;
+max-width:800px;
 width:100%;
-border-radius:15px;
-box-shadow:0 10px 30px rgba(0,0,0,0.1);
+border-radius:25px;
+box-shadow:0 15px 40px rgba(0,0,0,0.2);
 padding:30px;
+text-align:center;
 }
 
-h1{text-align:center;}
-
-.question{
-margin:15px 0;
-padding:10px;
-background:#f9f9f9;
-border-radius:8px;
+h1{
+color:#d00000;
+margin-bottom:10px;
 }
 
 input{
-padding:6px;
-font-size:16px;
-margin-top:5px;
+padding:10px;
+font-size:18px;
+border-radius:15px;
+border:2px solid #ff4d6d;
+text-align:center;
+width:200px;
 }
 
 button{
-padding:10px 15px;
-margin-top:15px;
-background:#2c3e50;
+background:#d00000;
 color:white;
 border:none;
-border-radius:5px;
+padding:12px 20px;
+border-radius:15px;
+font-size:16px;
 cursor:pointer;
+margin:10px;
+}
+
+button:disabled{
+background:#ccc;
+cursor:not-allowed;
+}
+
+.question{
+font-size:20px;
+margin:20px 0;
+min-height:60px;
+}
+
+.progress{
+height:15px;
+background:#ffd6de;
+border-radius:20px;
+overflow:hidden;
+margin-top:10px;
+}
+
+.bar{
+height:15px;
+background:#d00000;
+width:0%;
+transition:0.4s;
 }
 
 .result{
 margin-top:20px;
-padding:15px;
-background:#eef2f7;
-border-radius:8px;
+font-size:20px;
 }
 </style>
 </head>
@@ -62,21 +89,32 @@ border-radius:8px;
 
 <div class="app">
 
-<h1>📚 ТЕСТ 8</h1>
+<h1>👑 Магична Башта Бројева 🌹</h1>
 
-<input id="student" placeholder="Унеси име ученика">
-<button onclick="startTest()">Започни тест</button>
+<input id="studentName" placeholder="Унеси своје име">
+<button onclick="startGame()">Почни тест</button>
 
-<div id="testArea"></div>
+<div id="gameArea" style="display:none;">
+<div class="question" id="question"></div>
 
-<div id="result" class="result"></div>
+<input id="answer">
+<br>
+<button onclick="nextQuestion()">Следеће</button>
+
+<div class="progress">
+<div class="bar" id="progressBar"></div>
+</div>
+
+<div class="result" id="result"></div>
+</div>
 
 </div>
 
 <script>
 let questions=[];
-let answers=[];
-let studentName="";
+let current=0;
+let score=0;
+let student="";
 
 function normalize(text){
 return text.toLowerCase()
@@ -86,86 +124,111 @@ return text.toLowerCase()
 .trim();
 }
 
-function startTest(){
-studentName=document.getElementById("student").value;
-if(!studentName) return alert("Унеси име ученика");
+function startGame(){
+student=document.getElementById("studentName").value;
+if(!student) return alert("Унеси име");
 
 generateQuestions();
-renderTest();
+document.getElementById("gameArea").style.display="block";
+showQuestion();
 }
 
 function generateQuestions(){
-
 questions=[
-{q:"1. Напиши цифрама број: деветнаест",a:"19"},
-{q:"1. Напиши цифрама број: дванаест",a:"12"},
-{q:"1. Напиши цифрама број: осам",a:"8"},
-{q:"1. Напиши цифрама број: четрнаест",a:"14"},
-{q:"1. Напиши цифрама број: осамнаест",a:"18"},
+{q:"1. Напиши цифрама број деветнаест",a:"19"},
+{q:"2. Напиши цифрама број дванаест",a:"12"},
+{q:"3. Напиши цифрама број осамнаест",a:"18"},
+{q:"4. Напиши цифрама број четрнаест",a:"14"},
 
-{q:"2. Који број има 1Д 0Ј?",a:"10"},
-{q:"2. Који број има 1Д 1Ј?",a:"11"},
-{q:"2. Који број има 1Д 5Ј?",a:"15"},
-{q:"2. Који број има 0Д 5Ј?",a:"5"},
+{q:"5. Који број има 1Д 0Ј?",a:"10"},
+{q:"6. Који број има 1Д 5Ј?",a:"15"},
+{q:"7. Који број има 0Д 5Ј?",a:"5"},
+{q:"8. Који број има 1Д 1Ј?",a:"11"},
 
-{q:"3. Наброј непарне бројеве између 12 и 20 (раздвој запетом)",a:"13,15,17,19"},
-{q:"4. Наброј парне бројеве веће од 8 а мање од 18",a:"10,12,14,16"},
+{q:"9. Наброј непарне бројеве између 12 и 20",a:"13,15,17,19"},
+{q:"10. Наброј парне бројеве веће од 8 а мање од 18",a:"10,12,14,16"},
+{q:"11. Наброј непарне бројеве између 10 и 20",a:"11,13,15,17,19"},
+{q:"12. Наброј парне бројеве прве десетице",a:"2,4,6,8,10"},
 
-{q:"6. Упореди: 18 __ 20",a:"<"},
-{q:"6. Упореди: 1Д __ 9Ј",a:">"},
-{q:"6. Упореди: 17 __ 1Д 7Ј",a:"="},
-{q:"6. Упореди: 2Д __ 1Д 5Ј",a:">"},
+{q:"13. Упореди 18 __ 20",a:"<"},
+{q:"14. Упореди 2Д __ 1Д 5Ј",a:">"},
+{q:"15. Упореди 17 __ 1Д 7Ј",a:"="},
+{q:"16. Упореди 7 + 2 __ 13",a:"<"},
 
-{q:"7а. Парни број мањи од 14 а већи од 10",a:"12"},
-{q:"7б. Непарни број већи од 13 а мањи од 17",a:"15"},
-{q:"7в. Непарни претходник броја 19",a:"17"},
-{q:"7г. Парни следбеник броја 19",a:"20"}
+{q:"17. Парни број мањи од 14 а већи од 10",a:"12"},
+{q:"18. Непарни број већи од 13 а мањи од 17",a:"15"},
+{q:"19. Непарни претходник броја 19",a:"17"},
+{q:"20. Парни следбеник броја 19",a:"20"},
+
+{q:"21. Израчунај 10Ј + 6Ј",a:"16"},
+{q:"22. 13 = __Д __Ј",a:"1 3"},
+{q:"23. 20 = __Д __Ј",a:"2 0"},
+{q:"24. Највећи непарни број друге десетице",a:"19"},
+
+{q:"25. Напиши речима број 16",a:"шеснаест"},
+{q:"26. Напиши речима број 12",a:"дванаест"},
+{q:"27. Напиши цифрама: деветнаест",a:"19"},
+{q:"28. Напиши цифрама: двадесет",a:"20"},
+
+{q:"29. Поређај: 5, 14, 3 (од најмањег)",a:"3,5,14"},
+{q:"30. Израчунај збир прва три непарна броја",a:"9"}
 ];
 }
 
-function renderTest(){
-let area=document.getElementById("testArea");
-area.innerHTML="";
+function showQuestion(){
+document.getElementById("question").innerText=
+"Питање "+(current+1)+" од 30: "+questions[current].q;
+document.getElementById("answer").value="";
+updateProgress();
+}
 
-questions.forEach((item,index)=>{
-area.innerHTML+=`
-<div class="question">
-<p>${item.q}</p>
-<input id="q${index}">
-</div>
-`;
-});
+function nextQuestion(){
+let user=normalize(document.getElementById("answer").value);
+let correct=normalize(questions[current].a);
 
-area.innerHTML+=`<button onclick="finishTest()">Заврши тест</button>`;
+if(user==""){
+alert("Мораш одговорити на питање!");
+return;
+}
+
+if(user==correct) score++;
+
+current++;
+
+if(current<questions.length){
+showQuestion();
+}else{
+finishTest();
+}
+}
+
+function updateProgress(){
+document.getElementById("progressBar").style.width=
+((current/30)*100)+"%";
 }
 
 function finishTest(){
-let correct=0;
-
-questions.forEach((item,index)=>{
-let user=document.getElementById("q"+index).value;
-if(normalize(user)==normalize(item.a)) correct++;
-});
-
-let percent=Math.round((correct/questions.length)*100);
+let percent=Math.round((score/30)*100);
 let grade=1;
-
 if(percent>=90) grade=5;
 else if(percent>=75) grade=4;
 else if(percent>=60) grade=3;
 else if(percent>=40) grade=2;
 
+document.getElementById("question").innerText="Тест је завршен!";
+document.getElementById("answer").style.display="none";
+document.querySelector("button").style.display="none";
+
 document.getElementById("result").innerHTML=
 `
-<h3>Резултат ученика: ${studentName}</h3>
-<p>Тачно: ${correct} од ${questions.length}</p>
-<p>Проценат: ${percent}%</p>
-<p><strong>Оцена: ${grade}</strong></p>
+🌸 ${student} 🌸<br>
+Тачно: ${score} од 30<br>
+Проценат: ${percent}%<br>
+Оцена: ${grade}
 `;
 
-localStorage.setItem(studentName,JSON.stringify({
-correct:correct,
-total:questions.length,
+localStorage.setItem(student,JSON.stringify({
+score:score,
 percent:percent,
 grade:grade
 }));
