@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌹 Магична Башта Бројева PRO</title>
+<title>Магична Башта Бројева PRO</title>
 
 <style>
-
 body{
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
@@ -14,13 +13,12 @@ background:linear-gradient(135deg,#ff4d6d,#ff758f);
 display:flex;
 justify-content:center;
 padding:20px;
-overflow-x:hidden;
 }
 
 .app{
 background:white;
 color:#b00020;
-max-width:1000px;
+max-width:900px;
 width:100%;
 border-radius:25px;
 box-shadow:0 15px 40px rgba(0,0,0,0.25);
@@ -30,18 +28,17 @@ font-weight:bold;
 }
 
 h1{
-color:#d00000;
-font-size:30px;
+font-size:28px;
 font-weight:900;
 }
 
 input{
-padding:14px;
+padding:12px;
 font-size:20px;
 border-radius:15px;
 border:3px solid #ff4d6d;
 text-align:center;
-width:300px;
+width:280px;
 font-weight:bold;
 }
 
@@ -49,7 +46,7 @@ button{
 background:#d00000;
 color:white;
 border:none;
-padding:14px 24px;
+padding:14px 22px;
 border-radius:15px;
 font-size:18px;
 cursor:pointer;
@@ -58,10 +55,9 @@ font-weight:bold;
 }
 
 .question{
-font-size:24px;
+font-size:22px;
 margin:25px 0;
 min-height:70px;
-font-weight:900;
 }
 
 .stats{
@@ -90,7 +86,6 @@ transition:0.4s;
 .result{
 margin-top:25px;
 font-size:22px;
-font-weight:900;
 }
 
 .feedback{
@@ -112,13 +107,6 @@ transform:translateY(100vh);
 opacity:0;
 }
 }
-
-@media (max-width:600px){
-.question{font-size:20px;}
-input{width:95%;}
-button{width:95%;}
-}
-
 </style>
 </head>
 
@@ -126,9 +114,9 @@ button{width:95%;}
 
 <div class="app">
 
-<h1>👑 МАГИЧНА БАШТА БРОЈЕВА 🌹</h1>
+<h1>МАГИЧНА БАШТА БРОЈЕВА 🌹</h1>
 
-<input id="studentName" placeholder="УНЕСИ СВОЈЕ ИМЕ">
+<input id="studentName" placeholder="УНЕСИ ИМЕ">
 <br>
 <button onclick="startGame()">ПОЧНИ ТЕСТ (30 ПИТАЊА)</button>
 
@@ -164,7 +152,7 @@ let current=0;
 let score=0;
 let wrong=0;
 
-// ===== NORMALIZACIJA =====
+// ===== NORMALIZACIJA LATINICA → ĆIRILICA =====
 function normalize(text){
 text=text.toLowerCase().trim();
 
@@ -194,17 +182,22 @@ return text.replace(/\s/g,"")
 .join(",");
 }
 
-function smartCheck(user,correct){
+function smartCheck(user, correct){
 
-if(correct.includes(",")){
-return parseNumbers(user)==parseNumbers(correct);
+let correctStr = String(correct);
+
+// niz
+if(correctStr.indexOf(",") !== -1){
+return parseNumbers(user) === parseNumbers(correctStr);
 }
 
-if(!isNaN(correct)){
-return Number(user)==Number(correct);
+// broj
+if(!isNaN(correctStr)){
+return Number(user) === Number(correctStr);
 }
 
-return normalize(user)==normalize(correct);
+// tekst
+return normalize(user) === normalize(correctStr);
 }
 
 function rand(min,max){
@@ -217,19 +210,19 @@ let pool=[];
 
 // CIFRE
 let words=[
-["ЈЕДАНАЕСТ",11],["ДВАНАЕСТ",12],["ТРИНАЕСТ",13],
-["ЧЕТРНАЕСТ",14],["ПЕТНАЕСТ",15],
-["ШЕСНАЕСТ",16],["СЕДАМНАЕСТ",17],
-["ОСАМНАЕСТ",18],["ДЕВЕТНАЕСТ",19]
+["једанаест",11],["дванаест",12],["тринаест",13],
+["четрнаест",14],["петнаест",15],
+["шеснаест",16],["седамнаест",17],
+["осамнаест",18],["деветнаест",19]
 ];
 
-for(let i=0;i<6;i++){
+for(let i=0;i<8;i++){
 let w=words[rand(0,words.length-1)];
-pool.push({q:"НАПИШИ ЦИФРАМА БРОЈ "+w[0],a:w[1].toString()});
+pool.push({q:"НАПИШИ ЦИФРАМА БРОЈ "+w[0],a:w[1]});
 }
 
 // PARNI
-for(let i=0;i<6;i++){
+for(let i=0;i<7;i++){
 let n=rand(5,20);
 pool.push({
 q:"ДА ЛИ ЈЕ БРОЈ "+n+" ПАРАН? (ДА/НЕ)",
@@ -237,26 +230,22 @@ a:(n%2==0)?"да":"не"
 });
 }
 
-// JEDINICE / DESETICE
-for(let i=0;i<6;i++){
+// JEDINICE
+for(let i=0;i<7;i++){
 let n=rand(11,20);
 pool.push({
 q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ "+n+"?",
-a:(n%10).toString()
-});
-pool.push({
-q:"КОЛИКО ДЕСЕТИЦА ИМА БРОЈ "+n+"?",
-a:Math.floor(n/10).toString()
+a:n%10
 });
 }
 
 // RAČUN
-for(let i=0;i<6;i++){
+for(let i=0;i<8;i++){
 let a=rand(5,15);
 let b=rand(1,10);
 pool.push({
 q:"ИЗРАЧУНАЈ "+a+" + "+b,
-a:(a+b).toString()
+a:a+b
 });
 }
 
@@ -306,7 +295,7 @@ updateStats();
 current++;
 
 if(current<30){
-setTimeout(showQuestion,800);
+setTimeout(showQuestion,700);
 }else{
 finishTest();
 }
@@ -349,7 +338,7 @@ document.getElementById("answer").style.display="none";
 
 document.getElementById("result").innerHTML=
 `
-🌸 РЕЗУЛТАТ 🌸<br>
+РЕЗУЛТАТ:<br>
 ТАЧНО: ${score} ОД 30<br>
 ПРОЦЕНАТ: ${percent}%<br>
 ОЦЕНА: ${grade}
@@ -357,5 +346,6 @@ document.getElementById("result").innerHTML=
 }
 
 </script>
+
 </body>
 </html>
