@@ -6,10 +6,9 @@
 <title>👑 Магична Школа Бројева</title>
 
 <style>
-
 body{
 margin:0;
-font-family:Arial, Helvetica, sans-serif;
+font-family:Arial, sans-serif;
 background:linear-gradient(135deg,#ff4d6d,#ff1e56);
 display:flex;
 justify-content:center;
@@ -18,7 +17,7 @@ padding:20px;
 
 .app{
 background:white;
-max-width:850px;
+max-width:900px;
 width:100%;
 border-radius:25px;
 padding:30px;
@@ -28,10 +27,7 @@ font-weight:bold;
 color:#b00020;
 }
 
-h1{
-font-size:28px;
-color:#d00000;
-}
+h1{font-size:26px;}
 
 input{
 padding:12px;
@@ -93,13 +89,6 @@ transform:translateY(100vh);
 opacity:0;
 }
 }
-
-@media (max-width:600px){
-.question{font-size:20px;}
-input{width:95%;}
-button{width:95%;}
-}
-
 </style>
 </head>
 
@@ -109,7 +98,7 @@ button{width:95%;}
 
 <h1>👑 МАГИЧНА ШКОЛА БРОЈЕВА 🌹</h1>
 
-<input id="studentName" placeholder="УНЕСИ СВОЈЕ ИМЕ">
+<input id="studentName" placeholder="УНЕСИ ИМЕ">
 <br>
 <button onclick="startGame()">ПОЧНИ ТЕСТ (30 ПИТАЊА)</button>
 
@@ -141,65 +130,97 @@ let index=0;
 let score=0;
 let wrong=0;
 
-// ===== LATINICA → ĆIRILICA =====
 function normalize(text){
 text=text.toLowerCase().trim();
-
-const map={
-"a":"а","b":"б","c":"ц","č":"ч","ć":"ћ",
-"d":"д","đ":"ђ","e":"е","f":"ф",
-"g":"г","h":"х","i":"и","j":"ј",
-"k":"к","l":"л","m":"м","n":"н",
-"o":"о","p":"п","r":"р","s":"с",
-"š":"ш","t":"т","u":"у","v":"в",
-"z":"з","ž":"ж"
-};
-
-let result="";
-for(let char of text){
-result+=map[char]||char;
-}
-return result.replace(/\s+/g,"");
+return text.replace(/\s+/g,"");
 }
 
-// ===== GENERATOR 30 PITANJA =====
+function parseNumbers(text){
+return text.replace(/\s/g,"")
+.split(",")
+.map(n=>n.trim())
+.filter(n=>n!=="")
+.sort()
+.join(",");
+}
+
+function smartCheck(user,correct){
+
+if(correct.includes(",")){
+return parseNumbers(user)===parseNumbers(correct);
+}
+
+if(!isNaN(correct)){
+return Number(user)===Number(correct);
+}
+
+return normalize(user)===normalize(correct);
+}
+
 function generate(){
+
 questions=[];
 
-for(let i=0;i<10;i++){
-let n=Math.floor(Math.random()*10)+10;
+// 1️⃣ ODUZIMANJE TEKSTUALNO
+for(let i=0;i<5;i++){
+let a=Math.floor(Math.random()*10)+10;
+let b=Math.floor(Math.random()*a);
 questions.push({
-q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ "+n+"?",
-a:(n%10).toString()
+q:"МИЛИЦА ЈЕ ИМАЛА "+a+" БОМБОНА. ПОЈЕЛА ЈЕ "+b+". КОЛИКО ЈОЈ ЈЕ ОСТАЛО?",
+a:(a-b).toString()
 });
 }
 
-for(let i=0;i<10;i++){
-let a=Math.floor(Math.random()*10)+5;
-let b=Math.floor(Math.random()*10)+1;
+// 2️⃣ NASTAVI NIZ (parni druga desetica)
 questions.push({
-q:"ИЗРАЧУНАЈ "+a+" + "+b,
-a:(a+b).toString()
+q:"НАСТАВИ НИЗ ПАРНИХ БРОЈЕВА ДРУГЕ ДЕСЕТИЦЕ ОД 12",
+a:"12,14,16,18,20"
 });
-}
 
-for(let i=0;i<10;i++){
-let n=Math.floor(Math.random()*20)+1;
 questions.push({
-q:"ДА ЛИ ЈЕ БРОЈ "+n+" ПАРАН? (ДА/НЕ)",
-a:(n%2==0)?"да":"не"
+q:"НАСТАВИ НИЗ НЕПАРНИХ БРОЈЕВА ДРУГЕ ДЕСЕТИЦЕ ОД 11",
+a:"11,13,15,17,19"
+});
+
+// 3️⃣ TEŠKE VARIJANTE NIZOVA
+questions.push({
+q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДО 20",
+a:"2,4,6,8,10,12,14,16,18,20"
+});
+
+questions.push({
+q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",
+a:"1,3,5,7,9,11,13,15,17,19"
+});
+
+questions.push({
+q:"НАПИШИ СВЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",
+a:"11,12,13,14,15,16,17,18,19,20"
+});
+
+// 4️⃣ NASTAVI KRATKE NIZOVE
+questions.push({q:"НАСТАВИ НИЗ: 2,4,6,__,__",a:"8,10"});
+questions.push({q:"НАСТАВИ НИЗ: 19,17,15,__,__",a:"13,11"});
+questions.push({q:"НАСТАВИ НИЗ: 11,13,15,__,__",a:"17,19"});
+questions.push({q:"НАСТАВИ НИЗ: 10,12,14,__,__",a:"16,18"});
+
+// DODATNA TEŽA ODUZIMANJA
+for(let i=0;i<10;i++){
+let a=Math.floor(Math.random()*10)+10;
+let b=Math.floor(Math.random()*10);
+questions.push({
+q:"ИЗРАЧУНАЈ "+a+" - "+b,
+a:(a-b).toString()
 });
 }
 
 questions.sort(()=>Math.random()-0.5);
+questions=questions.slice(0,30);
 }
 
 function startGame(){
 let name=document.getElementById("studentName").value;
-if(!name){
-alert("УНЕСИ ИМЕ");
-return;
-}
+if(!name){alert("УНЕСИ ИМЕ");return;}
 generate();
 document.getElementById("gameArea").style.display="block";
 show();
@@ -215,23 +236,11 @@ document.getElementById("feedback").innerText="";
 function nextQuestion(){
 
 let user=document.getElementById("answer").value;
-if(user.trim()==""){
-alert("УНЕСИ ОДГОВОР");
-return;
-}
+if(user.trim()==""){alert("УНЕСИ ОДГОВОР");return;}
 
 let correct=questions[index].a;
-let ok=false;
 
-// broj
-if(!isNaN(correct)){
-ok = Number(user) === Number(correct);
-}
-else{
-ok = normalize(user) === normalize(correct);
-}
-
-if(ok){
+if(smartCheck(user,correct)){
 score++;
 document.getElementById("feedback").innerText="ТАЧНО 💖";
 heartsEffect();
@@ -241,7 +250,6 @@ document.getElementById("feedback").innerText="НЕТАЧНО ❌";
 }
 
 updateStats();
-
 index++;
 
 if(index<30){
