@@ -8,30 +8,14 @@ let totalQuestions=10;
 
 function normalize(text){
 text=text.toLowerCase().trim();
-
-const map={
-"a":"а","b":"б","c":"ц","č":"ч","ć":"ћ",
-"d":"д","đ":"ђ","e":"е","f":"ф",
-"g":"г","h":"х","i":"и","j":"ј",
-"k":"к","l":"л","m":"м","n":"н",
-"o":"о","p":"п","r":"р","s":"с",
-"š":"ш","t":"т","u":"у","v":"в",
-"z":"з","ž":"ж"
-};
-
+const map={"a":"а","b":"б","c":"ц","č":"ч","ć":"ћ","d":"д","đ":"ђ","e":"е","f":"ф","g":"г","h":"х","i":"и","j":"ј","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","š":"ш","t":"т","u":"у","v":"в","z":"з","ž":"ж"};
 let result="";
-for(let char of text){
-result+=map[char]||char;
-}
+for(let char of text){ result+=map[char]||char; }
 return result.replace(/\s+/g,"");
 }
 
 function normalizeList(text){
-return text.replace(/\s/g,"")
-.split(",")
-.filter(n=>n!=="")
-.map(Number)
-.sort((a,b)=>a-b);
+return text.replace(/\s/g,"").split(",").filter(n=>n!=="").map(Number).sort((a,b)=>a-b);
 }
 
 /* ================= SRCA ================= */
@@ -75,7 +59,6 @@ window.onload=applyUnlock;
 /* ================= START ================= */
 
 function startLevel(level){
-
 let name=document.getElementById("studentName").value;
 if(!name){ alert("УНЕСИ ИМЕ 👑"); return; }
 
@@ -90,7 +73,7 @@ buildQuestions(level);
 showQuestion();
 }
 
-/* ================= BAZA PITANJA ================= */
+/* ================= PITANJA ================= */
 
 function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
 
@@ -98,6 +81,7 @@ function buildQuestions(level){
 
 let pool=[];
 
+/* ---- NIVO 1 ---- */
 if(level===1){
 totalQuestions=10;
 pool=[
@@ -107,15 +91,15 @@ pool=[
 {q:"ПРЕТХОДНИК БРОЈА 13",a:"12"},
 {q:"СЛЕДБЕНИК БРОЈА 18",a:"19"},
 {q:"НАЈМАЊИ ПАРНИ БРОЈ ДО 10",a:"2"},
-{q:"УПИШИ ЗНАК: 16 __ 19",a:"<"},
-{q:"УПИШИ ЗНАК: 15 __ 15",a:"="},
+{q:"УПИШИ ЗНАК: 16 __ 19",a:"<",type:"sign"},
+{q:"УПИШИ ЗНАК: 15 __ 15",a:"=",type:"sign"},
 {q:"БРОЈ ИЗМЕЂУ 12 И 14",a:"13"},
 {q:"КОЛИКО ДЕСЕТИЦА ИМА БРОЈ 20?",a:"2"},
-{q:"НАПИШИ ЦИФРАМА: ПЕТНАЕСТ",a:"15"},
-{q:"НАЈВЕЋИ НЕПАРНИ БРОЈ ДО 20",a:"19"}
+{q:"НАПИШИ ЦИФРАМА: ПЕТНАЕСТ",a:"15"}
 ];
 }
 
+/* ---- NIVO 2 ---- */
 if(level===2){
 totalQuestions=10;
 pool=[
@@ -124,30 +108,32 @@ pool=[
 {q:"НЕПАРАН БРОЈ ИЗМЕЂУ 10 И 14",a:"11"},
 {q:"ПАРНИ ПРЕТХОДНИК БРОЈА 19",a:"18"},
 {q:"НЕПАРНИ СЛЕДБЕНИК БРОЈА 18",a:"19"},
-{q:"НАЈМАЊИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"11"},
-{q:"ПАРАН БРОЈ ИЗМЕЂУ 14 И 18",a:"16"},
 {q:"ДА ЛИ ЈЕ 13 ПАРАН? (ДА/НЕ)",a:"не"},
+{q:"УПИШИ ЗНАК: 14 __ 18",a:"<",type:"sign"},
 {q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",a:"1,3,5,7,9,11,13,15,17,19",type:"subset"},
-{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ОД 12 ДО 20",a:"12,14,16,18,20",type:"subset"}
+{q:"ПАРАН БРОЈ ИЗМЕЂУ 14 И 18",a:"16"},
+{q:"НАЈМАЊИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"11"}
 ];
 }
 
+/* ---- NIVO 3 ---- */
 if(level===3){
 totalQuestions=10;
 pool=[
 {q:"НАСТАВИ НИЗ: 2,4,6,__,__",a:"8,10"},
 {q:"НАСТАВИ НИЗ: 3,6,9,__,__",a:"12,15"},
 {q:"НАСТАВИ НИЗ: 19,17,15,__,__",a:"13,11"},
-{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"12,14,16,18,20"},
 {q:"НАСТАВИ НИЗ: 10,12,14,__,__",a:"16,18"},
 {q:"НАСТАВИ НИЗ: 5,10,15,__,__",a:"20,25"},
-{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"11,13,15,17,19"},
+{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"12,14,16,18,20",type:"subset"},
 {q:"НАСТАВИ НИЗ: 1,3,5,__,__",a:"7,9"},
 {q:"НАСТАВИ НИЗ: 20,18,16,__,__",a:"14,12"},
+{q:"УПИШИ ЗНАК: 12 __ 11",a:">",type:"sign"},
 {q:"НАСТАВИ НИЗ: 4,8,12,__,__",a:"16,20"}
 ];
 }
 
+/* ---- NIVO 4 ---- */
 if(level===4){
 totalQuestions=10;
 pool=[
@@ -157,13 +143,14 @@ pool=[
 {q:"ИЗРАЧУНАЈ 18 - 7",a:"11"},
 {q:"ИЗРАЧУНАЈ 20 - 8",a:"12"},
 {q:"ИЗРАЧУНАЈ 16 - 9",a:"7"},
+{q:"УПИШИ ЗНАК: 13 __ 17",a:"<",type:"sign"},
 {q:"ИЗРАЧУНАЈ 19 - 5",a:"14"},
 {q:"ИЗРАЧУНАЈ 17 - 6",a:"11"},
-{q:"САРА ЈЕ ИМАЛА 14 ЦВЕТОВА. УБРАЛА ЈЕ 4. НАПИШИ ПОСТУПАК.",a:10,type:"oduz"},
-{q:"ЛЕНА ЈЕ ИМАЛА 13 ЦВЕТОВА. УБРАЛА ЈЕ 3. НАПИШИ ПОСТУПАК.",a:10,type:"oduz"}
+{q:"САРА ЈЕ ИМАЛА 14 ЦВЕТОВА. УБРАЛА ЈЕ 4. НАПИШИ ПОСТУПАК.",a:10,type:"oduz"}
 ];
 }
 
+/* ---- NIVO 5 ---- */
 if(level===5){
 totalQuestions=30;
 let all=[];
@@ -192,6 +179,19 @@ container.appendChild(btn);
 });
 }
 
+function showSignKeyboard(){
+let keys=["<",">","="];
+let container=document.getElementById("keyboardContainer");
+container.innerHTML="";
+keys.forEach(k=>{
+let btn=document.createElement("button");
+btn.innerText=k;
+btn.className="signBtn";
+btn.onclick=function(){ document.getElementById("answer").value=k; };
+container.appendChild(btn);
+});
+}
+
 function showCyrillicKeyboard(){
 let letters=["А","Б","В","Г","Д","Ђ","Е","Ж","З","И","Ј","К","Л","Љ","М","Н","Њ","О","П","Р","С","Т","Ћ","У","Ф","Х","Ц","Ч","Џ","Ш"];
 let container=document.getElementById("keyboardContainer");
@@ -205,7 +205,9 @@ container.appendChild(btn);
 });
 }
 
-function addChar(c){ document.getElementById("answer").value+=c; }
+function addChar(c){
+document.getElementById("answer").value+=c;
+}
 
 /* ================= IGRA ================= */
 
@@ -217,11 +219,14 @@ document.getElementById("question").innerText=
 "ПИТАЊЕ "+(index+1)+" ОД "+totalQuestions+": "+q.q;
 
 document.getElementById("answer").value="";
-document.getElementById("feedback")?.remove;
 
-if(q.type==="oduz" || q.type==="subset" || !isNaN(q.a)){
+if(q.type==="sign"){
+showSignKeyboard();
+}
+else if(q.type==="oduz" || q.type==="subset" || !isNaN(q.a)){
 showNumericKeyboard();
-}else{
+}
+else{
 showCyrillicKeyboard();
 }
 }
