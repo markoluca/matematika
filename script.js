@@ -18,7 +18,7 @@ return text.replace(/\s/g,"")
 }
 
 function hearts(){
-for(let i=0;i<15;i++){
+for(let i=0;i<12;i++){
 let h=document.createElement("div");
 h.className="heart";
 h.innerHTML="❤";
@@ -56,16 +56,31 @@ if(level===1){
 totalQuestions=10;
 questions=[
 {q:"НАПИШИ ЦИФРАМА: ДЕВЕТНАЕСТ",a:"19"},
+{q:"НАПИШИ РЕЧИМА БРОЈ 16",a:"шеснаест"},
 {q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 20?",a:"0"},
-{q:"НАЈВЕЋИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"19"}
+{q:"КОЛИКО ДЕСЕТИЦА ИМА БРОЈ 20?",a:"2"},
+{q:"НАЈМАЊИ НЕПАРНИ ДВОЦИФРЕНИ БРОЈ",a:"11"},
+{q:"НАЈВЕЋИ ПАРНИ БРОЈ ПРВЕ ДЕСЕТИЦЕ",a:"10"},
+{q:"ПРЕТХОДНИК БРОЈА 15",a:"14"},
+{q:"СЛЕДБЕНИК БРОЈА 19",a:"20"},
+{q:"УПИШИ ЗНАК: 18 __ 20",a:"<"},
+{q:"УПИШИ ЗНАК: 17 __ 1Д7Ј",a:"="}
 ];
 }
 
 if(level===2){
 totalQuestions=10;
 questions=[
+{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДО 20",a:"2,4,6,8,10,12,14,16,18,20",type:"subset"},
+{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",a:"1,3,5,7,9,11,13,15,17,19",type:"subset"},
 {q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ОД 12 ДО 20",a:"12,14,16,18,20",type:"subset"},
-{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",a:"1,3,5,7,9,11,13,15,17,19",type:"subset"}
+{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ОД 11 ДО 19",a:"11,13,15,17,19",type:"subset"},
+{q:"ПАРНИ ПРЕТХОДНИК БРОЈА 15",a:"14"},
+{q:"НЕПАРНИ СЛЕДБЕНИК БРОЈА 14",a:"15"},
+{q:"НАЈВЕЋИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"19"},
+{q:"НАЈМАЊИ ПАРНИ БРОЈ ПРВЕ ДЕСЕТИЦЕ",a:"2"},
+{q:"ДА ЛИ ЈЕ 18 ПАРАН? (ДА/НЕ)",a:"да"},
+{q:"ДА ЛИ ЈЕ 17 ПАРАН? (ДА/НЕ)",a:"не"}
 ];
 }
 
@@ -73,34 +88,52 @@ if(level===3){
 totalQuestions=10;
 questions=[
 {q:"НАСТАВИ НИЗ: 2,4,6,__,__",a:"8,10"},
-{q:"НАСТАВИ НИЗ: 19,17,15,__,__",a:"13,11"}
+{q:"НАСТАВИ НИЗ: 11,13,15,__,__",a:"17,19"},
+{q:"НАСТАВИ НИЗ: 19,17,15,__,__",a:"13,11"},
+{q:"НАПИШИ СВЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"11,12,13,14,15,16,17,18,19,20"},
+{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"12,14,16,18,20"},
+{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"11,13,15,17,19"},
+{q:"НАСТАВИ НИЗ: 10,12,14,__,__",a:"16,18"},
+{q:"НАСТАВИ НИЗ: 1,3,5,__,__",a:"7,9"},
+{q:"НАСТАВИ НИЗ: 20,18,16,__,__",a:"14,12"},
+{q:"НАСТАВИ НИЗ: 5,10,15,__,__",a:"20,25"}
 ];
 }
 
 if(level===4){
 totalQuestions=10;
 questions=[
-{q:"АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. НАПИШИ ЦЕО ПОСТУПАК.",a:12,type:"oduz"},
-{q:"МИЛИЦА ЈЕ ИМАЛА 15 БОМБОНА. ДАЛА ЈЕ 7. НАПИШИ ЦЕО ПОСТУПАК.",a:8,type:"oduz"}
+{q:"АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. НАПИШИ ПОСТУПАК.",a:12,type:"oduz"},
+{q:"МИЛИЦА ЈЕ ИМАЛА 15 БОМБОНА. ДАЛА ЈЕ 7. НАПИШИ ПОСТУПАК.",a:8,type:"oduz"},
+{q:"ПЕТАР ЈЕ ИМАО 20 ЛОПТИ. ИЗГУБИО ЈЕ 9. НАПИШИ ПОСТУПАК.",a:11,type:"oduz"},
+{q:"ЈОВАН ЈЕ ИМАО 17 КЊИГА. ПОКЛОНИО ЈЕ 5. НАПИШИ ПОСТУПАК.",a:12,type:"oduz"},
+{q:"САРА ЈЕ ИМАЛА 14 ЦВЕТОВА. УБРАЛА ЈЕ 4. НАПИШИ ПОСТУПАК.",a:10,type:"oduz"},
+{q:"ИЗРАЧУНАЈ 18 - 7",a:"11"},
+{q:"ИЗРАЧУНАЈ 20 - 8",a:"12"},
+{q:"ИЗРАЧУНАЈ 16 - 9",a:"7"},
+{q:"ИЗРАЧУНАЈ 19 - 5",a:"14"},
+{q:"ИЗРАЧУНАЈ 17 - 6",a:"11"}
 ];
 }
 
 if(level===5){
 totalQuestions=30;
-questions=[
-{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ОД 12 ДО 20",a:"12,14,16,18,20",type:"subset"},
-{q:"АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. НАПИШИ ЦЕО ПОСТУПАК.",a:12,type:"oduz"},
-{q:"НАЈВЕЋИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"19"}
-];
+questions = [].concat(
+buildLevelQuestions(1),
+buildLevelQuestions(2),
+buildLevelQuestions(3),
+buildLevelQuestions(4)
+);
+questions = questions.slice(0,30);
 }
 
-while(questions.length<totalQuestions){
-questions = questions.concat(questions);
 }
 
-questions = questions.slice(0,totalQuestions);
-questions.sort(()=>Math.random()-0.5);
-
+function buildLevelQuestions(level){
+let temp=[];
+buildQuestions(level);
+temp=[...questions];
+return temp;
 }
 
 function showQuestion(){
@@ -159,8 +192,6 @@ wrong++;
 document.getElementById("feedback").innerText="НЕТАЧНО ❌";
 }
 
-updateStats();
-
 index++;
 
 if(index<totalQuestions){
@@ -168,13 +199,6 @@ setTimeout(showQuestion,800);
 }else{
 finishLevel();
 }
-}
-
-function updateStats(){
-document.getElementById("correctCount").innerText=score;
-document.getElementById("wrongCount").innerText=wrong;
-let percent=Math.round((score/(score+wrong))*100);
-document.getElementById("percent").innerText=percent;
 }
 
 function finishLevel(){
@@ -187,40 +211,22 @@ else if(percent>=75) grade=4;
 else if(percent>=60) grade=3;
 else if(percent>=40) grade=2;
 
-let medal="";
-if(grade===5) medal="👑 ЗЛАТНА КРУНА!";
-if(grade===4) medal="🥇 ЗЛАТНА МЕДАЉА!";
-if(grade===3) medal="🥈 СРЕБРНА МЕДАЉА!";
-if(grade===2) medal="🥉 БРОНЗАНА МЕДАЉА!";
-
 document.getElementById("result").innerHTML=
 "🌸 РЕЗУЛТАТ 🌸<br>"+
+"ТАЧНО: "+score+" ОД "+totalQuestions+"<br>"+
 "ПРОЦЕНАТ: "+percent+"%<br>"+
-"ОЦЕНА: "+grade+"<br>"+
-"<div class='medal'>"+medal+"</div>";
+"ОЦЕНА: "+grade;
 
-saveProgress(percent);
-
-}
-
-function saveProgress(percent){
-
-let name=document.getElementById("studentName").value;
-
-let data=JSON.parse(localStorage.getItem("princessResults"))||{};
-data[name]={level:currentLevel,score:percent};
-localStorage.setItem("princessResults",JSON.stringify(data));
-
-if(percent>=60){
+if(score>=8 && totalQuestions===10){
 unlockNextLevel();
 }
 }
 
 function unlockNextLevel(){
-let nextLevel=currentLevel+1;
-let el=document.getElementById("level"+nextLevel);
+let next=currentLevel+1;
+let el=document.getElementById("level"+next);
 if(el){
 el.classList.remove("locked");
-el.onclick=function(){startLevel(nextLevel);}
+el.onclick=function(){startLevel(next);}
 }
 }
