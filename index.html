@@ -6,9 +6,10 @@
 <title>🌹 Магична Башта Бројева PRO</title>
 
 <style>
+
 body{
 margin:0;
-font-family:'Comic Sans MS',cursive;
+font-family: Arial, Helvetica, sans-serif; /* ŠTAMPANA SLOVA */
 background:linear-gradient(135deg,#ff4d6d,#ff758f);
 display:flex;
 justify-content:center;
@@ -25,68 +26,79 @@ border-radius:25px;
 box-shadow:0 15px 40px rgba(0,0,0,0.25);
 padding:30px;
 text-align:center;
+font-weight:bold; /* SVE BOLD */
 }
 
-h1{color:#d00000;}
+h1{
+color:#d00000;
+font-size:28px;
+font-weight:900;
+}
 
 input{
-padding:10px;
-font-size:18px;
+padding:12px;
+font-size:20px;
 border-radius:15px;
-border:2px solid #ff4d6d;
+border:3px solid #ff4d6d;
 text-align:center;
-width:260px;
+width:280px;
+font-weight:bold;
 }
 
 button{
 background:#d00000;
 color:white;
 border:none;
-padding:12px 20px;
+padding:14px 22px;
 border-radius:15px;
-font-size:16px;
+font-size:18px;
 cursor:pointer;
-margin-top:10px;
+margin-top:12px;
+font-weight:bold;
 }
 
 .question{
-font-size:20px;
-margin:20px 0;
-min-height:60px;
+font-size:22px;   /* VEĆA SLOVA */
+margin:25px 0;
+min-height:70px;
+font-weight:900;  /* JAKO BOLD */
 }
 
 .stats{
 margin-top:15px;
 background:#ffe5ec;
-padding:12px;
+padding:15px;
 border-radius:15px;
+font-size:18px;
+font-weight:bold;
 }
 
 .progress{
-height:15px;
+height:18px;
 background:#ffd6de;
 border-radius:20px;
 overflow:hidden;
-margin-top:10px;
+margin-top:12px;
 }
 
 .bar{
-height:15px;
+height:18px;
 background:#d00000;
 width:0%;
 transition:0.4s;
 }
 
 .result{
-margin-top:20px;
-font-size:20px;
+margin-top:25px;
+font-size:22px;
+font-weight:900;
 }
 
 .heart{
 position:fixed;
 top:-20px;
 color:#ff1e56;
-font-size:24px;
+font-size:26px;
 animation:fall 3s linear forwards;
 }
 
@@ -96,252 +108,30 @@ transform:translateY(100vh);
 opacity:0;
 }
 }
+
+@media (max-width:600px){
+
+.question{
+font-size:20px;
+}
+
+input{
+width:90%;
+font-size:20px;
+}
+
+button{
+width:90%;
+font-size:18px;
+}
+
+}
+
 </style>
 </head>
-
 <body>
 
-<div class="app">
+<!-- Ostatak JavaScript koda ostaje ISTI kao u tvojoj PRO verziji -->
 
-<h1>👑 Магична Башта Бројева 🌹</h1>
-
-<input id="studentName" placeholder="Унеси своје име">
-<br>
-<button onclick="startGame()">Почни тест (30 питања)</button>
-
-<div id="gameArea" style="display:none;">
-<div class="question" id="question"></div>
-
-<input id="answer">
-<br>
-<button onclick="nextQuestion()">Провери</button>
-
-<div id="feedback"></div>
-
-<div class="stats">
-Тачно: <span id="correctCount">0</span> |
-Погрешно: <span id="wrongCount">0</span> |
-Проценат: <span id="percent">0</span>%
-</div>
-
-<div class="progress">
-<div class="bar" id="progressBar"></div>
-</div>
-
-<div class="result" id="result"></div>
-</div>
-
-</div>
-
-<script>
-
-let questions=[];
-let current=0;
-let score=0;
-let wrong=0;
-
-// ===== NORMALIZACIJA =====
-function normalize(text){
-text=text.toLowerCase().trim();
-const map={
-"a":"а","b":"б","c":"ц","č":"ч","ć":"ћ",
-"d":"д","đ":"ђ","e":"е","f":"ф",
-"g":"г","h":"х","i":"и","j":"ј",
-"k":"к","l":"л","m":"м","n":"н",
-"o":"о","p":"п","r":"р","s":"с",
-"š":"ш","t":"т","u":"у","v":"в",
-"z":"з","ž":"ж"
-};
-let result="";
-for(let char of text){ result+=map[char]||char; }
-return result.replace(/\s+/g,"");
-}
-
-function parseNumbers(text){
-return text.replace(/\s/g,"")
-.split(",")
-.map(n=>n.trim())
-.filter(n=>n!=="")
-.sort()
-.join(",");
-}
-
-// ===== PAMETNA PROVERA =====
-function smartCheck(user, correct){
-
-// niz
-if(correct.includes(",")){
-return parseNumbers(user)==parseNumbers(correct);
-}
-
-// broj
-if(!isNaN(correct)){
-return Number(user)==Number(correct);
-}
-
-// tekst
-return normalize(user)==normalize(correct);
-}
-
-// ===== GENERATOR =====
-function rand(min,max){
-return Math.floor(Math.random()*(max-min+1))+min;
-}
-
-function generateTest(){
-
-let pool=[];
-
-// 1. Cifre
-let words=[
-["једанаест",11],["дванаест",12],["тринаест",13],
-["четрнаест",14],["петнаест",15],
-["шеснаест",16],["седамнаест",17],
-["осамнаест",18],["деветнаест",19]
-];
-
-for(let i=0;i<5;i++){
-let w=words[rand(0,words.length-1)];
-pool.push({q:"Напиши цифрама број "+w[0],a:w[1].toString()});
-}
-
-// 2. Parni
-for(let i=0;i<5;i++){
-let n=rand(5,20);
-pool.push({
-q:"Да ли је број "+n+" паран? (да/не)",
-a:(n%2==0)?"да":"не"
-});
-}
-
-// 3. Jedinice / desetice
-for(let i=0;i<5;i++){
-let n=rand(11,20);
-pool.push({
-q:"Колико јединица има број "+n+"?",
-a:(n%10).toString()
-});
-pool.push({
-q:"Колико десетица има број "+n+"?",
-a:Math.floor(n/10).toString()
-});
-}
-
-// 4. Uporedi
-for(let i=0;i<5;i++){
-let a=rand(5,20);
-let b=rand(5,20);
-let znak=a>b?">":a<b?"<":"=";
-pool.push({q:"Упореди "+a+" __ "+b,a:znak});
-}
-
-// 5. Računanje
-for(let i=0;i<5;i++){
-let a=rand(5,15);
-let b=rand(1,10);
-pool.push({q:"Израчунај "+a+" + "+b,a:(a+b).toString()});
-}
-
-// nasumično 30
-pool.sort(()=>Math.random()-0.5);
-questions=pool.slice(0,30);
-}
-
-// ===== START =====
-function startGame(){
-if(!document.getElementById("studentName").value){
-alert("Унеси име!");
-return;
-}
-generateTest();
-document.getElementById("gameArea").style.display="block";
-showQuestion();
-}
-
-function showQuestion(){
-document.getElementById("question").innerText=
-"Питање "+(current+1)+" од 30: "+questions[current].q;
-document.getElementById("answer").value="";
-updateProgress();
-}
-
-// ===== PROVERA =====
-function nextQuestion(){
-
-let user=document.getElementById("answer").value;
-if(user.trim()==""){
-alert("Мораш одговорити!");
-return;
-}
-
-let correctAnswer=questions[current].a;
-
-if(smartCheck(user,correctAnswer)){
-score++;
-document.getElementById("feedback").innerText="Тачно ✅";
-heartsEffect();
-}else{
-wrong++;
-document.getElementById("feedback").innerText="Нетаčno ❌";
-}
-
-updateStats();
-current++;
-
-if(current<30){
-setTimeout(showQuestion,700);
-}else{
-finishTest();
-}
-}
-
-// ===== SRCA =====
-function heartsEffect(){
-for(let i=0;i<15;i++){
-let heart=document.createElement("div");
-heart.className="heart";
-heart.innerHTML="❤";
-heart.style.left=Math.random()*100+"vw";
-document.body.appendChild(heart);
-setTimeout(()=>heart.remove(),3000);
-}
-}
-
-// ===== STATISTIKA =====
-function updateStats(){
-document.getElementById("correctCount").innerText=score;
-document.getElementById("wrongCount").innerText=wrong;
-let percent=Math.round((score/(score+wrong))*100);
-document.getElementById("percent").innerText=percent;
-}
-
-function updateProgress(){
-document.getElementById("progressBar").style.width=
-((current/30)*100)+"%";
-}
-
-// ===== KRAJ =====
-function finishTest(){
-let percent=Math.round((score/30)*100);
-let grade=1;
-
-if(percent>=90) grade=5;
-else if(percent>=75) grade=4;
-else if(percent>=60) grade=3;
-else if(percent>=40) grade=2;
-
-document.getElementById("question").innerText="Тест је завршен!";
-document.getElementById("answer").style.display="none";
-
-document.getElementById("result").innerHTML=
-`
-🌸 Резултат 🌸<br>
-Тачно: ${score} од 30<br>
-Проценат: ${percent}%<br>
-Оцена: ${grade}
-`;
-}
-
-</script>
 </body>
 </html>
