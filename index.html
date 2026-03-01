@@ -6,7 +6,6 @@
 <title>👑 Магична школа бројева</title>
 
 <style>
-
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -28,10 +27,7 @@ font-weight:bold;
 color:#b00020;
 }
 
-h1{
-font-size:26px;
-margin-bottom:20px;
-}
+h1{font-size:26px;}
 
 input{
 padding:12px;
@@ -93,7 +89,6 @@ transform:translateY(100vh);
 opacity:0;
 }
 }
-
 </style>
 </head>
 
@@ -130,47 +125,58 @@ opacity:0;
 
 <script>
 
-let allQuestions=[];
 let questions=[];
 let index=0;
 let score=0;
 let wrong=0;
-let lastType="";
 
-// LATINICA → ĆIRILICA
 function normalize(text){
 text=text.toLowerCase().trim();
-
-const map={
-"a":"а","b":"б","c":"ц","č":"ч","ć":"ћ",
-"d":"д","đ":"ђ","e":"е","f":"ф",
-"g":"г","h":"х","i":"и","j":"ј",
-"k":"к","l":"л","m":"м","n":"н",
-"o":"о","p":"п","r":"р","s":"с",
-"š":"ш","t":"т","u":"у","v":"в",
-"z":"з","ž":"ж"
-};
-
-let result="";
-for(let char of text){
-result+=map[char]||char;
-}
-return result.replace(/\s+/g,"");
+return text.replace(/\s+/g,"");
 }
 
-// sortiranje nizova
 function normalizeList(text){
 return text.replace(/\s/g,"")
 .split(",")
 .filter(n=>n!=="")
-.sort()
-.join(",");
+.map(Number)
+.sort((a,b)=>a-b);
 }
 
-function smartCheck(user,correct){
+function isValidSubset(userArr,correctArr){
+
+for(let n of userArr){
+if(!correctArr.includes(n)) return false;
+}
+
+return userArr.length>0;
+}
+
+function smartCheck(user,correct,type){
+
+if(type==="oduz"){
+
+let cleaned=user.replace(/\s+/g,"");
+cleaned=cleaned.replace("–","-");
+
+let match=cleaned.match(/^(\d+)-(\d+)=(\d+)$/);
+if(!match) return false;
+
+let a=parseInt(match[1]);
+let b=parseInt(match[2]);
+let result=parseInt(match[3]);
+
+return (a-b===result) && (result==correct);
+}
+
+if(type==="subset"){
+let userArr=normalizeList(user);
+let correctArr=normalizeList(correct);
+return isValidSubset(userArr,correctArr);
+}
 
 if(correct.includes(",")){
-return normalizeList(user)===normalizeList(correct);
+return JSON.stringify(normalizeList(user))===JSON.stringify(normalizeList(correct));
 }
 
 if(!isNaN(correct)){
@@ -180,77 +186,56 @@ return Number(user)===Number(correct);
 return normalize(user)===normalize(correct);
 }
 
-function addQuestion(type,q,a){
-allQuestions.push({type,q,a});
-}
-
-function buildDatabase(){
-
-allQuestions=[];
-
-/* 1 PISANJE CIFRAMA */
-addQuestion("cifra","НАПИШИ ЦИФРАМА: ДЕВЕТНАЕСТ","19");
-addQuestion("cifra","НАПИШИ ЦИФРАМА: ЧЕТРНАЕСТ","14");
-addQuestion("cifra","НАПИШИ ЦИФРАМА: ОСАМНАЕСТ","18");
-
-/* 2 REČIMA */
-addQuestion("rec","НАПИШИ РЕЧИМА БРОЈ 16","шеснаест");
-addQuestion("rec","НАПИШИ РЕЧИМА БРОЈ 12","дванаест");
-addQuestion("rec","НАПИШИ РЕЧИМА БРОЈ 19","деветнаест");
-
-/* 3 DESETICE JEDINICE */
-addQuestion("dj","КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 13?","3");
-addQuestion("dj","КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 20?","0");
-addQuestion("dj","КОЛИКО ДЕСЕТИЦА ИМА БРОЈ 20?","2");
-
-/* 4 PARNE NEPARNE */
-addQuestion("par","НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ВЕЋЕ ОД 8 А МАЊЕ ОД 18","10,12,14,16");
-addQuestion("par","НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ИЗМЕЂУ 10 И 20","11,13,15,17,19");
-addQuestion("par","НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ПРВЕ ДЕСЕТИЦЕ","2,4,6,8,10");
-
-/* 5 PRETHODNIK */
-addQuestion("pre","НЕПАРНИ ПРЕТХОДНИК БРОЈА 19","17");
-addQuestion("pre","ПАРНИ СЛЕДБЕНИК БРОЈА 19","20");
-addQuestion("pre","ПРЕТХОДНИК БРОЈА 13","12");
-
-/* 6 ZNAK */
-addQuestion("znak","УПИШИ ЗНАК: 18 __ 20","<");
-addQuestion("znak","УПИШИ ЗНАК: 17 __ 1Д7Ј","=");
-addQuestion("znak","УПИШИ ЗНАК: 2Д __ 15Ј",">");
-
-/* 7 NAJVEĆI NAJMANJI */
-addQuestion("max","НАЈВЕЋИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ","19");
-addQuestion("max","НАЈМАЊИ ПАРНИ БРОЈ ПРВЕ ДЕСЕТИЦЕ","2");
-addQuestion("max","НАЈМАЊИ НЕПАРНИ ДВОЦИФРЕНИ БРОЈ","11");
-
-/* 8 NIZ */
-addQuestion("niz","НАСТАВИ НИЗ: 2,4,6,__,__","8,10");
-addQuestion("niz","НАСТАВИ НИЗ: 19,17,15,__,__","13,11");
-addQuestion("niz","НАСТАВИ НИЗ ПАРНИХ БРОЈЕВА ДРУГЕ ДЕСЕТИЦЕ ОД 12","12,14,16,18,20");
-
-/* 9 ODUZIMANJE */
-addQuestion("oduz","АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. КОЛИКО ЈЕ ОСТАЛО?","12");
-addQuestion("oduz","МИЛИЦА ЈЕ ИМАЛА 15 БОМБОНА. ДАЛА ЈЕ 7. КОЛИКО ЈОЈ ЈЕ ОСТАЛО?","8");
-addQuestion("oduz","ПЕТАР ЈЕ ИМАО 20 ЛОПТИ. ИЗГУБИО ЈЕ 9. КОЛИКО МУ ЈЕ ОСТАЛО?","11");
-
-}
-
-function generateTest(){
+function buildQuestions(){
 
 questions=[];
-let shuffled=[...allQuestions].sort(()=>Math.random()-0.5);
 
-for(let q of shuffled){
-if(questions.length===30) break;
-if(q.type!==lastType){
-questions.push(q);
-lastType=q.type;
-}
-}
+/* PARNE OD 12 DO 20 - dozvoljen podniz */
+questions.push({
+q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ОД 12 ДО 20",
+a:"12,14,16,18,20",
+type:"subset"
+});
+
+/* NEPARNE OD 11 DO 19 */
+questions.push({
+q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ОД 11 ДО 19",
+a:"11,13,15,17,19",
+type:"subset"
+});
+
+/* ODUZIMANJE */
+questions.push({
+q:"АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. НАПИШИ ЦЕО ПОСТУПАК.",
+a:12,
+type:"oduz"
+});
+
+questions.push({
+q:"МИЛИЦА ЈЕ ИМАЛА 15 БОМБОНА. ДАЛА ЈЕ 7. НАПИШИ ЦЕО ПОСТУПАК.",
+a:8,
+type:"oduz"
+});
+
+/* KLASIČNI */
+questions.push({
+q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 20?",
+a:"0",
+type:"normal"
+});
+
+questions.push({
+q:"НАЈВЕЋИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",
+a:"19",
+type:"normal"
+});
 
 while(questions.length<30){
-questions.push(shuffled[Math.floor(Math.random()*shuffled.length)]);
+questions=questions.concat(questions);
 }
+
+questions=questions.slice(0,30);
+questions.sort(()=>Math.random()-0.5);
 
 }
 
@@ -263,8 +248,7 @@ index=0;
 score=0;
 wrong=0;
 
-buildDatabase();
-generateTest();
+buildQuestions();
 
 document.getElementById("gameArea").style.display="block";
 show();
@@ -282,9 +266,9 @@ function checkAnswer(){
 let user=document.getElementById("answer").value;
 if(user.trim()==""){alert("УНЕСИ ОДГОВОР");return;}
 
-let correct=questions[index].a;
+let q=questions[index];
 
-if(smartCheck(user,correct)){
+if(smartCheck(user,q.a,q.type)){
 score++;
 document.getElementById("feedback").innerText="ТАЧНО 💖";
 hearts();
