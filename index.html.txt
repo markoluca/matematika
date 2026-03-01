@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👑 Магична Башта Бројева</title>
+
+<style>
+body{
+font-family:'Arial Rounded MT Bold', Arial, sans-serif;
+margin:0;
+padding:20px;
+text-align:center;
+background:linear-gradient(#ffe6f2,#fff4cc);
+transition:0.3s;
+}
+
+h1{color:#d63384;}
+
+.container{max-width:520px;margin:auto;}
+
+.card{
+background:white;
+border-radius:30px;
+padding:25px;
+box-shadow:0 15px 30px rgba(0,0,0,0.15);
+}
+
+button{
+padding:12px;
+border:none;
+border-radius:15px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+color:white;
+margin:5px;
+transition:0.2s;
+}
+
+button:hover{transform:scale(1.05);}
+
+.pink{background:#ff6b9d;}
+.purple{background:#845ec2;}
+.mint{background:#00c9a7;}
+.orange{background:#ff9671;}
+.teal{background:#4d8076;}
+
+.question{
+font-size:32px;
+margin:20px 0;
+}
+
+input{
+font-size:26px;
+padding:8px;
+width:120px;
+border-radius:15px;
+border:3px solid #ccc;
+text-align:center;
+}
+
+.correct{border-color:#28a745;}
+.wrong{border-color:#dc3545;}
+
+.feedback{height:24px;font-weight:bold;}
+
+.progress{
+height:12px;
+background:#eee;
+border-radius:20px;
+margin-top:10px;
+overflow:hidden;
+}
+
+.progress-bar{
+height:12px;
+background:#ff69b4;
+width:0%;
+transition:0.4s;
+}
+
+.badges{margin-top:10px;font-size:22px;}
+</style>
+</head>
+
+<body>
+
+<h1>👑 Магична Башта Бројева 🌸</h1>
+
+<div class="container">
+<div class="card">
+
+<input type="text" id="ime" placeholder="Унеси своје име">
+<button class="pink" onclick="sacuvajIme()">Сачувај</button>
+
+<h3 id="pozdrav"></h3>
+
+<div>
+<button class="pink" onclick="setCategory('cifre')">Напиши цифрама</button>
+<button class="purple" onclick="setCategory('parni')">Парни / Непарни</button>
+<button class="mint" onclick="setCategory('compare')">Упореди</button>
+<button class="orange" onclick="setCategory('redosled')">Редослед</button>
+<button class="teal" onclick="setCategory('sabiranje')">Сабирање</button>
+</div>
+
+<div class="question" id="question"></div>
+<input type="text" id="answer" oninput="checkAnswer()">
+
+<div class="feedback" id="feedback"></div>
+
+<p>⭐ Звездице: <span id="stars">0</span> | 👑 Ниво: <span id="level">1</span></p>
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+<div class="badges" id="badges"></div>
+
+</div>
+</div>
+
+<script>
+let category="cifre";
+let correct;
+let stars=parseInt(localStorage.getItem("stars")||0);
+let level=parseInt(localStorage.getItem("level")||1);
+let difficulty=1;
+
+ucitaj();
+
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+function sacuvajIme(){
+let ime=document.getElementById("ime").value;
+localStorage.setItem("ime",ime);
+document.getElementById("pozdrav").innerText="Добро дошла, "+ime+" 👑";
+}
+
+function ucitaj(){
+let ime=localStorage.getItem("ime");
+if(ime) document.getElementById("pozdrav").innerText="Добро дошла, "+ime+" 👑";
+updateUI();
+}
+
+function setCategory(cat){
+category=cat;
+newTask();
+}
+
+function updateUI(){
+document.getElementById("stars").innerText=stars;
+document.getElementById("level").innerText=level;
+document.getElementById("progressBar").style.width=(stars%10)*10+"%";
+
+let crowns="";
+for(let i=0;i<Math.floor(stars/10);i++) crowns+="👑 ";
+document.getElementById("badges").innerHTML=crowns;
+}
+
+function newTask(){
+
+if(category==="cifre"){
+const words=[
+["деветнаест",19],
+["дванаест",12],
+["осам",8],
+["четрнаест",14],
+["осамнаест",18]
+];
+let t=words[rand(0,words.length-1)];
+correct=t[1];
+document.getElementById("question").innerText="Напиши цифрама: "+t[0];
+}
+
+if(category==="parni"){
+let n=rand(1,20);
+correct=(n%2===0)?"да":"не";
+document.getElementById("question").innerText="Да ли је "+n+" паран? (да/не)";
+}
+
+if(category==="compare"){
+let a=rand(1,20),b=rand(1,20);
+correct=a>b?">":a<b?"<":"=";
+document.getElementById("question").innerText=a+" ? "+b;
+}
+
+if(category==="redosled"){
+let start=rand(1,15);
+correct=start+2;
+document.getElementById("question").innerText=start+", "+(start+1)+", __ , "+(start+3);
+}
+
+if(category==="sabiranje"){
+let a=rand(1,10),b=rand(1,10);
+correct=a+b;
+document.getElementById("question").innerText=a+" + "+b+" = ?";
+}
+
+document.getElementById("answer").value="";
+document.getElementById("feedback").innerText="";
+document.getElementById("answer").className="";
+}
+
+function checkAnswer(){
+let user=document.getElementById("answer").value.toLowerCase();
+
+if(user==correct){
+stars++;
+if(stars%20===0){level++;alert("Браво! Нови ниво 🎉");}
+localStorage.setItem("stars",stars);
+localStorage.setItem("level",level);
+
+updateUI();
+document.getElementById("answer").className="correct";
+document.getElementById("feedback").innerText="Браво принцезо! 🌸";
+
+setTimeout(newTask,800);
+}else{
+document.getElementById("answer").className="wrong";
+document.getElementById("feedback").innerText="Покушај поново 👑";
+}
+}
+
+newTask();
+</script>
+
+</body>
+</html>
