@@ -25,7 +25,6 @@ border-radius:25px;
 box-shadow:0 15px 40px rgba(0,0,0,0.25);
 padding:30px;
 text-align:center;
-position:relative;
 }
 
 h1{color:#d00000;}
@@ -36,7 +35,7 @@ font-size:18px;
 border-radius:15px;
 border:2px solid #ff4d6d;
 text-align:center;
-width:220px;
+width:250px;
 }
 
 button{
@@ -49,8 +48,6 @@ font-size:16px;
 cursor:pointer;
 margin-top:10px;
 }
-
-button:disabled{background:#ccc;}
 
 .question{
 font-size:20px;
@@ -89,7 +86,7 @@ font-size:20px;
 position:fixed;
 top:-20px;
 color:#ff1e56;
-font-size:20px;
+font-size:22px;
 animation:fall 3s linear forwards;
 }
 
@@ -137,22 +134,44 @@ opacity:0;
 </div>
 
 <script>
-let allQuestions=[];
 let questions=[];
 let current=0;
 let score=0;
 let wrong=0;
 let student="";
-let lastGroup="";
 
+// ================= NORMALIZACIJA =================
 function normalize(text){
-return text.toLowerCase()
+return text
+.toLowerCase()
+.replace(/\s+/g,"")
 .replace(/č/g,"ч").replace(/ć/g,"ћ")
 .replace(/š/g,"ш").replace(/ž/g,"ж")
-.replace(/đ/g,"ђ")
-.trim();
+.replace(/đ/g,"ђ");
 }
 
+// pretvara latinicu u ćirilicu za poređenje
+function latinToCyr(text){
+return text
+.replace(/c/g,"ц")
+.replace(/d/g,"д")
+.replace(/n/g,"н")
+.replace(/e/g,"е")
+.replace(/o/g,"о");
+}
+
+// ================= PARSIRANJE NIZA =================
+function parseNumbers(text){
+return text
+.replace(/\s/g,"")
+.split(",")
+.map(n=>n.trim())
+.filter(n=>n!=="")
+.sort()
+.join(",");
+}
+
+// ================= START =================
 function startGame(){
 student=document.getElementById("studentName").value;
 if(!student) return alert("Унеси име!");
@@ -163,40 +182,39 @@ document.getElementById("gameArea").style.display="block";
 showQuestion();
 }
 
+// ================= PITANJA =================
 function generateQuestions(){
-allQuestions=[
-{g:"cifre",q:"Напиши цифрама број деветнаест",a:"19"},
-{g:"cifre",q:"Напиши цифрама број дванаест",a:"12"},
-{g:"cifre",q:"Напиши цифрама број осамнаест",a:"18"},
-{g:"cifre",q:"Напиши цифрама број четрнаест",a:"14"},
+questions=[
+{q:"Напиши цифрама број деветнаест",a:"19"},
+{q:"Напиши цифрама број дванаест",a:"12"},
+{q:"Напиши цифрама број осамнаест",a:"18"},
+{q:"Напиши цифрама број четрнаест",a:"14"},
 
-{g:"desetice",q:"Који број има 1Д 0Ј?",a:"10"},
-{g:"desetice",q:"Који број има 1Д 5Ј?",a:"15"},
-{g:"desetice",q:"Који број има 0Д 5Ј?",a:"5"},
-{g:"desetice",q:"Који број има 1Д 1Ј?",a:"11"},
+{q:"Који број има 1Д 0Ј?",a:"10"},
+{q:"Који број има 1Д 5Ј?",a:"15"},
+{q:"Који број има 0Д 5Ј?",a:"5"},
+{q:"Који број има 1Д 1Ј?",a:"11"},
 
-{g:"parni",q:"Наброј парне бројеве прве десетице",a:"2,4,6,8,10"},
-{g:"parni",q:"Наброј непарне бројеве друге десетице",a:"11,13,15,17,19"},
-{g:"parni",q:"Да ли је 14 паран? (да/не)",a:"да"},
-{g:"parni",q:"Да ли је 15 паран? (да/не)",a:"не"},
+{q:"Наброј парне бројеве прве десетице",a:"2,4,6,8,10"},
+{q:"Наброј непарне бројеве друге десетице",a:"11,13,15,17,19"},
+{q:"Да ли је 14 паран? (да/не)",a:"да"},
+{q:"Да ли је 15 паран? (да/не)",a:"не"},
 
-{g:"uporedi",q:"Упореди 18 __ 20",a:"<"},
-{g:"uporedi",q:"Упореди 2Д __ 1Д 5Ј",a:">"},
-{g:"uporedi",q:"Упореди 7 + 2 __ 13",a:"<"},
-{g:"uporedi",q:"Упореди 17 __ 1Д 7Ј",a:"="},
+{q:"Упореди 18 __ 20",a:"<"},
+{q:"Упореди 2Д __ 1Д 5Ј",a:">"},
+{q:"Упореди 7 + 2 __ 13",a:"<"},
+{q:"Упореди 17 __ 1Д 7Ј",a:"="},
 
-{g:"racun",q:"Израчунај 10Ј + 6Ј",a:"16"},
-{g:"racun",q:"Израчунај 15 - 5",a:"10"},
-{g:"racun",q:"Израчунај 8 + 7",a:"15"},
-{g:"racun",q:"Израчунај 20 - 9",a:"11"},
+{q:"Израчунај 10Ј + 6Ј",a:"16"},
+{q:"Израчунај 15 - 5",a:"10"},
+{q:"Израчунај 8 + 7",a:"15"},
+{q:"Израчунај 20 - 9",a:"11"},
 
-{g:"redosled",q:"Допуни: 5, 6, __ , 8",a:"7"},
-{g:"redosled",q:"Допуни: 12, 13, __ , 15",a:"14"},
-{g:"redosled",q:"Парни број мањи од 14 а већи од 10",a:"12"},
-{g:"redosled",q:"Непарни претходник броја 19",a:"17"}
+{q:"Допуни: 5, 6, __ , 8",a:"7"},
+{q:"Допуни: 12, 13, __ , 15",a:"14"},
+{q:"Парни број мањи од 14 а већи од 10",a:"12"},
+{q:"Непарни претходник броја 19",a:"17"}
 ];
-
-questions=[...allQuestions];
 }
 
 function shuffleQuestions(){
@@ -211,16 +229,30 @@ document.getElementById("feedback").innerText="";
 updateProgress();
 }
 
+// ================= PROVERA =================
 function nextQuestion(){
-let user=normalize(document.getElementById("answer").value);
-if(user==""){
+let user=document.getElementById("answer").value;
+if(user.trim()==""){
 alert("Мораш одговорити!");
 return;
 }
 
-let correctAnswer=normalize(questions[current].a);
+let correctAnswer=questions[current].a;
 
-if(user==correctAnswer){
+let isCorrect=false;
+
+// Ako je niz brojeva
+if(correctAnswer.includes(",")){
+if(parseNumbers(user)==parseNumbers(correctAnswer)){
+isCorrect=true;
+}
+}else{
+if(normalize(user)==normalize(correctAnswer)){
+isCorrect=true;
+}
+}
+
+if(isCorrect){
 score++;
 document.getElementById("feedback").innerText="Тачно ✅";
 heartsEffect();
@@ -240,6 +272,7 @@ finishTest();
 }
 }
 
+// ================= SRCA =================
 function heartsEffect(){
 for(let i=0;i<15;i++){
 let heart=document.createElement("div");
@@ -251,6 +284,7 @@ setTimeout(()=>heart.remove(),3000);
 }
 }
 
+// ================= STATISTIKA =================
 function updateStats(){
 document.getElementById("correctCount").innerText=score;
 document.getElementById("wrongCount").innerText=wrong;
@@ -263,6 +297,7 @@ document.getElementById("progressBar").style.width=
 ((current/questions.length)*100)+"%";
 }
 
+// ================= KRAJ =================
 function finishTest(){
 let percent=Math.round((score/questions.length)*100);
 let grade=1;
