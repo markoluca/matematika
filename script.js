@@ -2,10 +2,11 @@ let currentLevel=1;
 let questions=[];
 let index=0;
 let score=0;
-let totalQuestions=10;
+let totalQuestions=5;
 let autoTimer=null;
+let countdownInterval=null;
 
-/* ================= NORMALIZACIJA ================= */
+/* NORMALIZACIJA */
 
 function normalize(text){
 text=text.toLowerCase().trim();
@@ -19,7 +20,7 @@ function normalizeList(text){
 return text.replace(/\s/g,"").split(",").filter(n=>n!=="").map(Number).sort((a,b)=>a-b);
 }
 
-/* ================= SRCA ================= */
+/* SRCA */
 
 function hearts(){
 for(let i=0;i<12;i++){
@@ -32,93 +33,56 @@ setTimeout(()=>h.remove(),3000);
 }
 }
 
-/* ================= OTKLJUČAVANJE ================= */
+/* TIMER */
 
-function unlockNext(){
-let unlocked=JSON.parse(localStorage.getItem("princess"))||[1];
-let next=currentLevel+1;
-if(next<=5 && !unlocked.includes(next)){
-unlocked.push(next);
-localStorage.setItem("princess",JSON.stringify(unlocked));
+function startTimer(seconds){
+
+clearInterval(countdownInterval);
+
+let timeLeft=seconds;
+let bar=document.getElementById("timerBar");
+bar.style.width="100%";
+
+countdownInterval=setInterval(()=>{
+timeLeft--;
+let percent=(timeLeft/seconds)*100;
+bar.style.width=percent+"%";
+
+if(timeLeft<=0){
+clearInterval(countdownInterval);
+checkAnswer();
 }
-applyUnlock();
+},1000);
 }
 
-function applyUnlock(){
-let unlocked=JSON.parse(localStorage.getItem("princess"))||[1];
-for(let i=1;i<=5;i++){
-let el=document.getElementById("level"+i);
-if(unlocked.includes(i)){
-el.classList.remove("locked");
-el.onclick=function(){ startLevel(i); };
-}
-}
-}
+/* START */
 
-window.onload=applyUnlock;
+window.onload=function(){
+document.getElementById("level1").onclick=function(){ startGame(); };
+};
 
-/* ================= START ================= */
-
-function startLevel(level){
+function startGame(){
 
 let name=document.getElementById("studentName").value;
 if(!name){ alert("УНЕСИ ИМЕ 👑"); return; }
 
-currentLevel=level;
-index=0;
-score=0;
-
 document.getElementById("map").classList.add("hidden");
 document.getElementById("gameArea").classList.remove("hidden");
 
-buildQuestions(level);
+questions=[
+{q:"НАПИШИ ЦИФРАМА: СЕДАМНАЕСТ",a:"17"},
+{q:"УПИШИ ЗНАК: 16 __ 19",a:"<",type:"sign"},
+{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДО 10",a:"2,4,6,8,10",type:"subset"},
+{q:"АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. НАПИШИ ПОСТУПАК.",a:12,type:"oduz"},
+{q:"НАПИШИ РЕЧИМА БРОЈ 18",a:"осамнаест"}
+];
+
+index=0;
+score=0;
 showQuestion();
 }
 
-/* ================= PITANJA ================= */
-
-function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
-
-function buildQuestions(level){
-
-let pool=[];
-
-if(level===1){
-totalQuestions=10;
-pool=[
-{q:"НАПИШИ ЦИФРАМА: СЕДАМНАЕСТ",a:"17"},
-{q:"НАПИШИ РЕЧИМА БРОЈ 18",a:"осамнаест"},
-{q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 14?",a:"4"},
-{q:"ПРЕТХОДНИК БРОЈА 13",a:"12"},
-{q:"УПИШИ ЗНАК: 16 __ 19",a:"<",type:"sign"},
-{q:"НАЈМАЊИ ПАРНИ БРОЈ ДО 10",a:"2"},
-{q:"БРОЈ ИЗМЕЂУ 12 И 14",a:"13"},
-{q:"КОЛИКО ДЕСЕТИЦА ИМА БРОЈ 20?",a:"2"},
-{q:"НАПИШИ ЦИФРАМА: ПЕТНАЕСТ",a:"15"},
-{q:"УПИШИ ЗНАК: 15 __ 15",a:"=",type:"sign"}
-];
-}
-
-if(level===2){
-totalQuestions=10;
-pool=[
-{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДО 20",a:"2,4,6,8,10,12,14,16,18,20",type:"subset"},
-{q:"ДА ЛИ ЈЕ 16 ПАРАН? (ДА/НЕ)",a:"да"},
-{q:"НЕПАРАН БРОЈ ИЗМЕЂУ 10 И 14",a:"11"},
-{q:"ПАРНИ ПРЕТХОДНИК БРОЈА 19",a:"18"},
-{q:"НЕПАРНИ СЛЕДБЕНИК БРОЈА 18",a:"19"},
-{q:"УПИШИ ЗНАК: 14 __ 18",a:"<",type:"sign"},
-{q:"ДА ЛИ ЈЕ 13 ПАРАН? (ДА/НЕ)",a:"не"},
-{q:"ПАРАН БРОЈ ИЗМЕЂУ 14 И 18",a:"16"},
-{q:"НАЈМАЊИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"11"},
-{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",a:"1,3,5,7,9,11,13,15,17,19",type:"subset"}
-];
-}
-
-questions=shuffle(pool);
-}
-
-/* ================= PRIKAZ ================= */
+/* PRIKAZ */
 
 function showQuestion(){
 
@@ -128,19 +92,24 @@ document.getElementById("question").innerText=
 "ПИТАЊЕ "+(index+1)+" ОД "+totalQuestions+": "+q.q;
 
 document.getElementById("answer").value="";
+document.getElementById("timerBar").style.width="100%";
+clearInterval(countdownInterval);
 
 if(q.type==="sign"){
 showSignKeyboard();
+startTimer(2);
 }
-else if(q.type==="subset" || !isNaN(q.a)){
+else if(q.type==="subset" || q.type==="oduz" || isNaN(q.a)){
 showNumericKeyboard();
+startTimer(20);
 }
 else{
-showCyrillicKeyboard();
+showNumericKeyboard();
+startTimer(2);
 }
 }
 
-/* ================= TASTATURE ================= */
+/* TASTATURE */
 
 function showNumericKeyboard(){
 let keys=["1","2","3","4","5","6","7","8","9","0","+","-","=","<",">",","];
@@ -165,21 +134,8 @@ btn.innerText=k;
 btn.className="signBtn";
 btn.onclick=function(){
 document.getElementById("answer").value=k;
-triggerAutoCheck();
+checkAnswer();
 };
-container.appendChild(btn);
-});
-}
-
-function showCyrillicKeyboard(){
-let letters=["А","Б","В","Г","Д","Ђ","Е","Ж","З","И","Ј","К","Л","Љ","М","Н","Њ","О","П","Р","С","Т","Ћ","У","Ф","Х","Ц","Ч","Џ","Ш"];
-let container=document.getElementById("keyboardContainer");
-container.innerHTML="";
-letters.forEach(l=>{
-let btn=document.createElement("button");
-btn.innerText=l;
-btn.className="keyBtn";
-btn.onclick=function(){ addChar(l); };
 container.appendChild(btn);
 });
 }
@@ -187,22 +143,27 @@ container.appendChild(btn);
 function addChar(c){
 let input=document.getElementById("answer");
 input.value+=c;
-triggerAutoCheck();
+
+let q=questions[index];
+
+if(smartCheck(input.value,q)){
+checkAnswer();
+}
 }
 
-/* ================= AUTO PROVERA ================= */
-
-function triggerAutoCheck(){
-if(autoTimer) clearTimeout(autoTimer);
-autoTimer=setTimeout(checkAnswer,600);
-}
-
-/* ================= PROVERA ================= */
+/* PROVERA */
 
 function smartCheck(user,q){
 
 if(q.type==="subset"){
 return JSON.stringify(normalizeList(user))===JSON.stringify(normalizeList(q.a));
+}
+
+if(q.type==="oduz"){
+let cleaned=user.replace(/\s+/g,"");
+let match=cleaned.match(/^(\d+)-(\d+)=(\d+)$/);
+if(!match) return false;
+return parseInt(match[3])==q.a;
 }
 
 if(!isNaN(q.a)){
@@ -219,6 +180,8 @@ if(!user) return;
 
 let q=questions[index];
 
+clearInterval(countdownInterval);
+
 if(smartCheck(user,q)){
 score++;
 hearts();
@@ -231,20 +194,8 @@ document.getElementById("percent").innerText=
 Math.round((score/totalQuestions)*100);
 
 if(index<totalQuestions){
-setTimeout(showQuestion,700);
+setTimeout(showQuestion,800);
 }else{
-finishLevel();
+alert("ГОТОВО 👑 ТАЧНО: "+score);
 }
-}
-
-function finishLevel(){
-
-if(score>=8){
-unlockNext();
-}
-
-setTimeout(()=>{
-document.getElementById("gameArea").classList.add("hidden");
-document.getElementById("map").classList.remove("hidden");
-},2000);
 }
