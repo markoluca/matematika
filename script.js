@@ -5,11 +5,10 @@ let score = 0;
 let totalQuestions = 10;
 
 /* ============================= */
-/* LATINICA → ĆIRILICA NORMALIZACIJA */
+/* NORMALIZACIJA LATINICA → ĆIRILICA */
 /* ============================= */
 
 function normalize(text){
-
 text=text.toLowerCase().trim();
 
 const map={
@@ -26,7 +25,6 @@ let result="";
 for(let char of text){
 result+=map[char]||char;
 }
-
 return result.replace(/\s+/g,"");
 }
 
@@ -43,7 +41,7 @@ return text.replace(/\s/g,"")
 /* ============================= */
 
 function hearts(){
-for(let i=0;i<12;i++){
+for(let i=0;i<10;i++){
 let h=document.createElement("div");
 h.className="heart";
 h.innerHTML="❤";
@@ -65,7 +63,7 @@ alert("УНЕСИ ИМЕ 👑");
 return;
 }
 
-currentLevel=level;
+currentLevel = level;
 index=0;
 score=0;
 
@@ -88,21 +86,15 @@ function buildQuestions(level){
 
 let pool=[];
 
-/* ====== NIVO 1 ====== */
-
+/* NIVO 1 */
 if(level===1){
-
 totalQuestions=10;
 
 pool=[
-
 {q:"НАПИШИ ЦИФРАМА: ДЕВЕТНАЕСТ",a:"19"},
 {q:"НАПИШИ ЦИФРАМА: ЧЕТРНАЕСТ",a:"14"},
-{q:"НАПИШИ ЦИФРАМА: ОСАМНАЕСТ",a:"18"},
 {q:"НАПИШИ РЕЧИМА БРОЈ 16",a:"шеснаест"},
-{q:"НАПИШИ РЕЧИМА БРОЈ 12",a:"дванаест"},
 {q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 20?",a:"0"},
-{q:"КОЛИКО ЈЕДИНИЦА ИМА БРОЈ 17?",a:"7"},
 {q:"ПРЕТХОДНИК БРОЈА 15",a:"14"},
 {q:"СЛЕДБЕНИК БРОЈА 19",a:"20"},
 {q:"УПИШИ ЗНАК: 18 __ 20",a:"<"},
@@ -110,83 +102,65 @@ pool=[
 {q:"НАЈМАЊИ НЕПАРНИ ДВОЦИФРЕНИ БРОЈ",a:"11"},
 {q:"НАЈВЕЋИ ПАРНИ БРОЈ ПРВЕ ДЕСЕТИЦЕ",a:"10"}
 ];
-
 }
 
-/* ====== NIVO 2 ====== */
-
+/* NIVO 2 */
 if(level===2){
-
 totalQuestions=10;
 
 pool=[
-
 {q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДО 20",a:"2,4,6,8,10,12,14,16,18,20",type:"subset"},
 {q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДО 20",a:"1,3,5,7,9,11,13,15,17,19",type:"subset"},
-{q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ОД 12 ДО 20",a:"12,14,16,18,20",type:"subset"},
-{q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ОД 11 ДО 19",a:"11,13,15,17,19",type:"subset"},
 {q:"ДА ЛИ ЈЕ 18 ПАРАН? (ДА/НЕ)",a:"да"},
 {q:"ДА ЛИ ЈЕ 17 ПАРАН? (ДА/НЕ)",a:"не"},
 {q:"ПАРНИ ПРЕТХОДНИК БРОЈА 15",a:"14"},
 {q:"НЕПАРНИ СЛЕДБЕНИК БРОЈА 14",a:"15"},
 {q:"НАЈВЕЋИ НЕПАРНИ БРОЈ ДРУГЕ ДЕСЕТИЦЕ",a:"19"},
 {q:"НАЈМАЊИ ПАРНИ БРОЈ ПРВЕ ДЕСЕТИЦЕ",a:"2"},
-{q:"ПАРАН БРОЈ ИЗМЕЂУ 10 И 14",a:"12"}
+{q:"ПАРАН БРОЈ ИЗМЕЂУ 10 И 14",a:"12"},
+{q:"НЕПАРАН БРОЈ ИЗМЕЂУ 14 И 18",a:"15"}
 ];
-
 }
 
-/* ====== NIVO 3 ====== */
-
+/* NIVO 3 */
 if(level===3){
-
 totalQuestions=10;
 
 pool=[
-
 {q:"НАСТАВИ НИЗ: 2,4,6,__,__",a:"8,10"},
 {q:"НАСТАВИ НИЗ: 11,13,15,__,__",a:"17,19"},
 {q:"НАСТАВИ НИЗ: 19,17,15,__,__",a:"13,11"},
 {q:"НАСТАВИ НИЗ: 10,12,14,__,__",a:"16,18"},
-{q:"НАСТАВИ НИЗ: 1,3,5,__,__",a:"7,9"},
-{q:"НАСТАВИ НИЗ: 20,18,16,__,__",a:"14,12"},
 {q:"НАПИШИ СВЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"11,12,13,14,15,16,17,18,19,20"},
 {q:"НАПИШИ СВЕ ПАРНЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"12,14,16,18,20"},
 {q:"НАПИШИ СВЕ НЕПАРНЕ БРОЈЕВЕ ДРУГЕ ДЕСЕТИЦЕ",a:"11,13,15,17,19"},
+{q:"НАСТАВИ НИЗ: 1,3,5,__,__",a:"7,9"},
+{q:"НАСТАВИ НИЗ: 20,18,16,__,__",a:"14,12"},
 {q:"НАСТАВИ НИЗ: 5,10,15,__,__",a:"20,25"}
 ];
-
 }
 
-/* ====== NIVO 4 ====== */
-
+/* NIVO 4 */
 if(level===4){
-
 totalQuestions=10;
 
 pool=[
-
 {q:"АНА ЈЕ ИМАЛА 18 ЈАБУКА. ПОЈЕЛА ЈЕ 6. НАПИШИ ПОСТУПАК.",a:12,type:"oduz"},
 {q:"МИЛИЦА ЈЕ ИМАЛА 15 БОМБОНА. ДАЛА ЈЕ 7. НАПИШИ ПОСТУПАК.",a:8,type:"oduz"},
 {q:"ПЕТАР ЈЕ ИМАО 20 ЛОПТИ. ИЗГУБИО ЈЕ 9. НАПИШИ ПОСТУПАК.",a:11,type:"oduz"},
-{q:"ЈОВАН ЈЕ ИМАО 17 КЊИГА. ПОКЛОНИО ЈЕ 5. НАПИШИ ПОСТУПАК.",a:12,type:"oduz"},
-{q:"САРА ЈЕ ИМАЛА 14 ЦВЕТОВА. УБРАЛА ЈЕ 4. НАПИШИ ПОСТУПАК.",a:10,type:"oduz"},
 {q:"ИЗРАЧУНАЈ 18 - 7",a:"11"},
 {q:"ИЗРАЧУНАЈ 20 - 8",a:"12"},
 {q:"ИЗРАЧУНАЈ 16 - 9",a:"7"},
 {q:"ИЗРАЧУНАЈ 19 - 5",a:"14"},
 {q:"ИЗРАЧУНАЈ 17 - 6",a:"11"},
+{q:"САРА ЈЕ ИМАЛА 14 ЦВЕТОВА. УБРАЛА ЈЕ 4. НАПИШИ ПОСТУПАК.",a:10,type:"oduz"},
 {q:"ЛЕНА ЈЕ ИМАЛА 13 ЦВЕТОВА. УБРАЛА ЈЕ 3. НАПИШИ ПОСТУПАК.",a:10,type:"oduz"}
 ];
-
 }
 
-/* ====== NIVO 5 ====== */
-
+/* NIVO 5 */
 if(level===5){
-
 totalQuestions=30;
-
 let all=[];
 for(let i=1;i<=4;i++){
 buildQuestions(i);
@@ -195,7 +169,6 @@ all=all.concat(questions);
 pool=all;
 }
 
-/* nasumično bez ponavljanja */
 questions = shuffle(pool).slice(0,totalQuestions);
 
 }
@@ -263,10 +236,6 @@ finishLevel();
 }
 }
 
-/* ============================= */
-/* ZAVRŠETAK */
-/* ============================= */
-
 function finishLevel(){
 
 let percent=Math.round((score/totalQuestions)*100);
@@ -283,48 +252,9 @@ document.getElementById("result").innerHTML=
 "ПРОЦЕНАТ: "+percent+"%<br>"+
 "ОЦЕНА: "+grade;
 
-if(totalQuestions===10 && score>=8){
-unlockNextLevel();
-}
-
 setTimeout(()=>{
 document.getElementById("gameArea").classList.add("hidden");
 document.getElementById("map").classList.remove("hidden");
 },3000);
 
 }
-
-/* ============================= */
-/* OTKLJUČAVANJE */
-/* ============================= */
-
-function unlockNextLevel(){
-
-let unlocked = JSON.parse(localStorage.getItem("unlockedLevels")) || [1];
-let next = currentLevel + 1;
-
-if(!unlocked.includes(next) && next<=5){
-unlocked.push(next);
-localStorage.setItem("unlockedLevels",JSON.stringify(unlocked));
-}
-
-applyUnlockedLevels();
-}
-
-function applyUnlockedLevels(){
-
-let unlocked = JSON.parse(localStorage.getItem("unlockedLevels")) || [1];
-
-for(let i=1;i<=5;i++){
-let el=document.getElementById("level"+i);
-if(el && unlocked.includes(i)){
-el.classList.remove("locked");
-el.onclick=function(){startLevel(i);}
-}
-}
-
-}
-
-window.onload=function(){
-applyUnlockedLevels();
-};
